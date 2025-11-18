@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Light Theme (Default - PRD Colors) */
+  :root {
+    --background: 240 240 220; /* Cream #F0F0DC */
+    --foreground: 54 69 79; /* Charcoal #36454F */
+    --card: 255 255 255; /* White cards */
+    --card-foreground: 54 69 79;
+    --popover: 255 255 255;
+    --popover-foreground: 54 69 79;
+    --primary: 173 216 230; /* Light Blue #ADD8E6 */
+    --primary-foreground: 54 69 79;
+    --secondary: 173 216 230;
+    --secondary-foreground: 54 69 79;
+    --muted: 220 220 220;
+    --muted-foreground: 100 100 100;
+    --accent: 173 216 230;
+    --accent-foreground: 54 69 79;
+    --destructive: 229 9 20;
+    --destructive-foreground: 255 255 255;
+    --border: 200 200 200;
+    --input: 200 200 200;
+    --ring: 173 216 230;
+    --radius: 0.5rem;
+  }
+
+  /* Dark Theme (Netflix-inspired) */
+  .dark {
+    --background: 18 18 21; /* #121215 - Dark background */
+    --foreground: 255 255 255;
+    --card: 24 24 24;
+    --card-foreground: 255 255 255;
+    --popover: 24 24 24;
+    --popover-foreground: 255 255 255;
+    --primary: 255 107 53; /* Orange */
+    --primary-foreground: 255 255 255;
+    --secondary: 47 47 47;
+    --secondary-foreground: 255 255 255;
+    --muted: 47 47 47;
+    --muted-foreground: 163 163 163;
+    --accent: 229 9 20; /* Red */
+    --accent-foreground: 255 255 255;
+    --destructive: 229 9 20;
+    --destructive-foreground: 255 255 255;
+    --border: 47 47 47;
+    --input: 47 47 47;
+    --ring: 255 107 53;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Light theme body */
+  :root body {
+    background-color: #FFFFFF; /* White background */
+    color: #36454F; /* Charcoal */
+  }
+  
+  /* Dark theme body */
+  .dark body {
+    background-color: #121215; /* Dark background */
+    color: white;
+  }
+
+  /* Better visual separation for cards and containers */
+  .card-separated {
+    @apply bg-white dark:bg-petflix-dark border border-gray-200/50 dark:border-gray-800/30 rounded-lg shadow-sm;
+  }
+
+  .section-separated {
+    @apply border-t border-gray-200/50 dark:border-gray-800/30;
+  }
+  
+  /* Prevent subpixel rendering issues and gradient banding */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  /* Smooth image rendering */
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Netflix-style scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #121215; /* Match new dark background */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2F2F2F;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Light mode scrollbar */
+:root ::-webkit-scrollbar-track {
+  background: #FFFFFF; /* Match new light background */
+}
+
+/* Toast animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}

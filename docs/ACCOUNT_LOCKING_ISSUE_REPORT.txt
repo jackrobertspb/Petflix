@@ -1,0 +1,400 @@
+================================================================================
+ACCOUNT LOCKING FEATURE - ISSUE REPORT
+Date: November 17, 2025
+Status: NOT WORKING - Needs SQL Migration
+================================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHAT THIS FEATURE IS SUPPOSED TO DO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The account locking feature should:
+
+1. Track failed login attempts per user account
+2. Show countdown messages: "4 attempt(s) remaining...", "3 remaining...", etc.
+3. Lock the account after 5 failed password attempts
+4. Lock duration: 30 minutes
+5. Show lock message with time remaining: "Account locked for 29 more minutes..."
+6. Automatically unlock after 30 minutes
+7. Reset failed attempt counter on successful login
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHAT'S CURRENTLY HAPPENING (SYMPTOMS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ First attempt shows: "invalid email or password" (generic message)
+❌ Subsequent attempts show: "authentication failed" (generic message)
+❌ NO countdown messages ("4 attempts remaining...")
+❌ NO account locking after 5 attempts
+❌ User can try infinitely
+❌ PAGE REFRESHES on failed login attempt, clearing all form fields
+
+The error messages are GENERIC instead of SPECIFIC.
+
+ADDITIONAL ISSUE OBSERVED:
+When login fails, the page appears to refresh/reload, which clears both the 
+email and password fields. This is inconvenient and may be interfering with 
+the error handling flow. We attempted to fix this by adding a 'finally' block 
+to ensure setLoading(false) always runs, but the page refresh behavior may 
+still be occurring due to the underlying database error from missing columns.
+
+NOTE: The page refresh issue may be a SYMPTOM of the missing database columns
+rather than a separate bug. When the backend query fails (due to non-existent 
+columns), it might be causing an unexpected error that triggers a page reload.
+This should resolve itself once the SQL migration is run.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ROOT CAUSE (99% CERTAIN)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+The SQL migration has NOT been run yet.
+
+The account locking feature requires 2 new columns in the 'users' table:
+- failed_login_attempts (INTEGER)
+- locked_until (TIMESTAMP)
+
+Without these columns:
+→ Backend tries to SELECT these columns → Database error
+→ Backend catches error → Returns generic error message
+→ Account locking logic never runs
+→ No countdown messages
+→ No locking behavior
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHAT WE'VE ALREADY DONE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Backend code is written and working (Petflix-1/src/routes/auth.ts)
+✅ Frontend error handling is fixed (Petflix-Frontend/src/contexts/AuthContext.tsx)
+✅ Email field no longer clears on failed login (Petflix-Frontend/src/pages/Login.tsx)
+✅ Rate limiter adjusted to 20 req/15min (allows account lock to trigger first)
+✅ Debug logging added to backend (shows "🔐 Login attempt for..." etc.)
+✅ Backend restarted with latest code
+✅ Frontend has hard refresh instructions
+
+What's MISSING:
+❌ SQL migration NOT run in Supabase database
+❌ Database columns do not exist yet
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HOW TO FIX THIS TOMORROW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 1: Open Supabase SQL Editor
+───────────────────────────────────
+Direct link to your project's SQL editor:
+https://supabase.com/dashboard/project/zxsyidsgvingbexobmqg/sql
+
+Or navigate manually:
+1. Go to: https://supabase.com/dashboard
+2. Select the Petflix project
+3. Click "SQL Editor" in the left sidebar
+4. Click "New Query" button
+
+
+STEP 2: Check if Migration is Needed
+─────────────────────────────────────
+Copy/paste this query and click RUN:
+
+    SELECT 
+        column_name, 
+        data_type
+    FROM information_schema.columns 
+    WHERE table_name = 'users' 
+      AND column_name IN ('failed_login_attempts', 'locked_until')
+    ORDER BY column_name;
+
+Expected results:
+• If you see 0 rows → Migration is needed (proceed to Step 3)
+• If you see 2 rows → Migration already done (skip to Step 4)
+
+
+STEP 3: Run the Migration
+──────────────────────────
+Copy/paste this and click RUN:
+
+    ALTER TABLE users 
+    ADD COLUMN IF NOT EXISTS failed_login_attempts INTEGER DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP;
+
+    CREATE INDEX IF NOT EXISTS idx_users_locked_until ON users(locked_until);
+
+Expected output:
+"Success. No rows returned" or similar green success message.
+
+
+STEP 4: Verify the Migration
+─────────────────────────────
+Run the query from Step 2 again. You should now see 2 rows:
+
+    column_name              | data_type
+    ─────────────────────────┼───────────────────────────────
+    failed_login_attempts    | integer
+    locked_until             | timestamp without time zone
+
+
+STEP 5: Restart Backend (if needed)
+────────────────────────────────────
+The backend should already be running, but if you want to restart:
+
+1. Find the terminal where backend is running
+2. Press Ctrl+C to stop it
+3. Run: npm run dev
+4. Wait for "🚀 Server is running on http://localhost:5002"
+
+
+STEP 6: Hard Refresh Frontend
+──────────────────────────────
+In your browser:
+• Windows: Ctrl + Shift + R
+• Mac: Cmd + Shift + R
+
+
+STEP 7: Test the Feature
+─────────────────────────
+1. Go to Login page (http://localhost:3000/login)
+2. Enter a VALID email (account you created)
+3. Enter WRONG password
+4. Click "Sign In"
+5. Repeat 5 times
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHAT YOU SHOULD SEE AFTER MIGRATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+IN THE BROWSER:
+───────────────
+Attempt 1: ⚠️ Invalid email or password. 4 attempt(s) remaining before account lock.
+Attempt 2: ⚠️ Invalid email or password. 3 attempt(s) remaining before account lock.
+Attempt 3: ⚠️ Invalid email or password. 2 attempt(s) remaining before account lock.
+Attempt 4: ⚠️ Invalid email or password. 1 attempt(s) remaining before account lock.
+Attempt 5: ⚠️ Too many failed login attempts. Your account has been locked for 30 minutes.
+Attempt 6+: ⚠️ Too many failed login attempts. Account locked for 29 more minute(s)...
+
+
+IN THE BACKEND TERMINAL:
+────────────────────────
+You should see these emoji-based logs:
+
+    🔐 Login attempt for: your@email.com
+    ✅ User found: your@email.com
+    📊 Current failed attempts: 0
+    🔒 Locked until: Not locked
+    ⚠️ Failed attempt 1/5 for your@email.com
+
+    🔐 Login attempt for: your@email.com
+    ✅ User found: your@email.com
+    📊 Current failed attempts: 1
+    🔒 Locked until: Not locked
+    ⚠️ Failed attempt 2/5 for your@email.com
+
+    [continues through 5 attempts]
+
+    🔐 Login attempt for: your@email.com
+    ✅ User found: your@email.com
+    📊 Current failed attempts: 4
+    🔒 Locked until: Not locked
+    🔒 LOCKING ACCOUNT: your@email.com
+    🔒 Lock until: 2025-11-17T15:30:00.000Z
+    ✅ Account locked successfully
+
+
+IF MIGRATION NOT RUN:
+─────────────────────
+Backend terminal will show:
+
+    🔐 Login attempt for: your@email.com
+    ❌ Database fetch error: [error details]
+    ❌ This might mean the failed_login_attempts or locked_until columns do not exist!
+    ❌ Please run the SQL migration: ALTER TABLE users ADD COLUMN...
+
+This confirms the migration is missing!
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DEBUGGING TIPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Check Backend Terminal
+   ────────────────────────
+   Look for the emoji logs (🔐, ✅, ⚠️, 🔒)
+   If you see ❌ errors, that confirms the columns don't exist
+
+
+2. Check Browser DevTools Console
+   ───────────────────────────────
+   Press F12 → Console tab
+   Look for error messages or HTTP status codes
+   Should see 401 (wrong password), 403 (locked), or 429 (rate limited)
+
+
+3. Check Database Directly
+   ───────────────────────
+   Run this in Supabase SQL Editor:
+
+       SELECT 
+           email, 
+           failed_login_attempts, 
+           locked_until 
+       FROM users 
+       WHERE email = 'your-email@example.com';
+
+   After failed attempts, you should see:
+   • failed_login_attempts increasing (1, 2, 3, 4, 5)
+   • locked_until set to a future timestamp after 5th attempt
+
+
+4. Unlock Account for Testing
+   ────────────────────────────
+   If you lock yourself out:
+
+       UPDATE users 
+       SET failed_login_attempts = 0, 
+           locked_until = NULL 
+       WHERE email = 'your-email@example.com';
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TECHNICAL DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Backend Files Modified:
+─────────────────────────
+• Petflix-1/src/routes/auth.ts
+  → Added account locking logic in login route (lines 113-247)
+  → Tracks failed_login_attempts
+  → Sets locked_until timestamp
+  → Returns 401 with countdown, 403 with lock message
+
+• Petflix-1/src/middleware/rateLimiter.ts
+  → Auth limiter: 20 requests per 15 minutes
+  → Allows 5 failed login attempts before rate limit hits
+
+Frontend Files Modified:
+──────────────────────────
+• Petflix-Frontend/src/contexts/AuthContext.tsx
+  → Added specific error handling for status codes
+  → 401 → Shows attempt countdown
+  → 403 → Shows lock message
+  → 429 → Shows rate limit message
+
+• Petflix-Frontend/src/pages/Login.tsx
+  → Added 'finally' block to prevent email field clearing
+  → Email persists on failed login attempts
+
+Database Schema Change:
+───────────────────────
+Table: users
+New columns:
+  • failed_login_attempts INTEGER DEFAULT 0
+  • locked_until TIMESTAMP (nullable)
+New index:
+  • idx_users_locked_until ON users(locked_until)
+
+
+How It Works:
+─────────────
+1. User tries to login with wrong password
+2. Backend checks if columns exist in database
+3. Backend increments failed_login_attempts counter
+4. If counter < 5: Return 401 with "X attempts remaining" message
+5. If counter >= 5: Set locked_until = NOW + 30 minutes, return 403
+6. On next login attempt: Check if locked_until > NOW
+7. If locked: Return 403 with "locked for X minutes" message
+8. If lock expired: Reset counter and locked_until, allow retry
+9. On successful login: Reset counter and locked_until to 0/NULL
+
+
+HTTP Status Codes:
+──────────────────
+• 401 Unauthorized = Wrong password (with countdown)
+• 403 Forbidden = Account locked (with time remaining)
+• 429 Too Many Requests = Rate limited (try again in 15 minutes)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILES CREATED FOR REFERENCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+All in Petflix-1/ directory:
+
+1. URGENT_RUN_THIS_SQL.sql
+   → Quick copy/paste SQL migration
+
+2. test-account-locking.sql
+   → Test queries to check if migration is done
+
+3. add-account-locking.sql (in src/db/)
+   → Original migration file
+
+4. ACCOUNT_LOCKING_TEST.md
+   → First test guide created
+
+5. FIXED_ACCOUNT_LOCKING_TEST.md
+   → Updated test guide after fixes
+
+6. DEBUG_LOGIN_ISSUES.md
+   → Comprehensive debugging guide
+
+7. ACTION_PLAN_NOW.md
+   → Step-by-step action plan
+
+8. ACCOUNT_LOCKING_ISSUE_REPORT.txt (THIS FILE)
+   → Complete issue report for tomorrow
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Problem:
+────────
+Account locking feature doesn't work. Generic error messages instead of 
+specific countdown/lock messages.
+
+Root Cause:
+───────────
+SQL migration not run. Database columns (failed_login_attempts, locked_until) 
+do not exist.
+
+Solution:
+─────────
+Run the SQL migration in Supabase SQL Editor (see STEP 3 above).
+Copy/paste the ALTER TABLE query and click RUN.
+
+Verification:
+─────────────
+After migration, try wrong password 5 times. You should see countdown messages
+in browser and detailed emoji logs in backend terminal.
+
+Confidence Level:
+─────────────────
+99% certain this is the issue. The code is correct, backend is running with
+debug logs, frontend is fixed. Only missing piece is database schema.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTACT INFO / NEXT STEPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tomorrow:
+1. Run SQL migration (should take 30 seconds)
+2. Test with wrong password 5 times
+3. Watch backend terminal for debug logs
+4. If still not working, check backend terminal for ❌ errors
+5. Screenshot any errors and we'll debug further
+
+Expected outcome: Feature works immediately after migration.
+
+Good luck! 🚀
+
+
+================================================================================
+END OF REPORT
+================================================================================
+

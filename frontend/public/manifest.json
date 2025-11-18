@@ -1,0 +1,64 @@
+{
+  "name": "Petflix - Pet Video Platform",
+  "short_name": "Petflix",
+  "description": "Unlimited pet videos, purrs, and paws. Watch, share, and discover the cutest pet moments from YouTube.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#141414",
+  "theme_color": "#FF6B35",
+  "orientation": "any",
+  "categories": ["entertainment", "social", "lifestyle"],
+  "icons": [
+    {
+      "src": "/pwa-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Search",
+      "short_name": "Search",
+      "description": "Search for pet videos",
+      "url": "/search",
+      "icons": [
+        {
+          "src": "/pwa-icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "My Feed",
+      "short_name": "Feed",
+      "description": "View your personalized feed",
+      "url": "/feed",
+      "icons": [
+        {
+          "src": "/pwa-icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Share Video",
+      "short_name": "Share",
+      "description": "Share a new video",
+      "url": "/share",
+      "icons": [
+        {
+          "src": "/pwa-icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
+

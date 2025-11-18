@@ -1,0 +1,80 @@
+USER PROMPTS RECORD
+===================
+
+1. "Attached is a PRD for a project. Look through it and give me the first step as to what we will do. I need you to follow the scope carefully and ensure everything is met by the end. @c:\Users\jack\Downloads\petflix-prd-2025-11-10.md"
+
+2. "give me instructions first. what clarifications do you need?"
+
+3. "can you answer these from the information in the scope?"
+
+4. "where were we?"
+
+5. "okay,  is everything that you just did faithful to the scope?"
+
+6. "ok cool, now can you tell me what your understanding of this project is? just to make sure it lines up with what i know"
+
+7. "Petflix is a responsive web application, enhanced by PWA functionality, designed to provide users with a dedicated platform to discover, share, and engage with pet videos sourced from YouTube. The core value proposition centers around curating a community of pet video enthusiasts, offering features such as searching for specific content, sharing preferred YouTube videos with other users, and following fellow pet lovers to appreciate a shared taste in content. Users can follow other users, comment on videos, and curate playlists of videos for their followers and other users to engage with.
+
+Built with modern web technologies, including React, TailwindCSS, Shadcn, Supabase, Express and leveraging the YouTube API, Petflix aims to deliver a seamless and enjoyable user experience across devices. Essential features for this MVP include user account management, video playback with TV casting functionality, web push notifications, social interaction through comments, and error handling. The PWA capabilities will include installability and limited offline access (metadata only). The initial focus will be on validating the core value proposition by providing a reliable platform for sharing and discovering pet videos.
+
+this is what i have been told, does this change anything from your understanding?"
+
+8. "can you take all my prompts and include them in a txt file in this project? one of the rules for this task is i have to record my prompts"
+
+9. "so in /backend and /frontend you need me to create 2 .env files?"
+
+10. "i ran the database scehma and it returned 'Success. No rows returned' is this right? if so, what is next to do?"
+
+11. "run those commands for me"
+
+12. "i definitely do have the frontend and backend .env files, are tey meant to be in petflix/backend/.env and petflix/frontend/.env?"
+
+13. "this content is already in both frontend and backend env files"
+
+14. "let's just move onto the dev servers"
+
+15. "lets just push this to github for now and fix it tmrw"
+
+16. "https://github.com/jackrobertspb/Petflix this is my repo, can you do it"
+
+17. "can you add all my newest prompts into the txt file that arent there already"
+
+SESSION: November 17, 2025 - All User Messages
+===============================================
+
+18. "isnt the tv casting already implemented due to the videos being taken from youtube using the api?"
+
+19. "go ahead with the high priority then"
+
+20. "on the login page, i have a complaint
+
+when you attempt to login, it refreshes the page and then clears the email field if the login is wrong
+
+this just makes it inconvenient
+
+
+
+also, the 5 tries thing doesn't work. i can try infinitely"
+
+21. "okay it kind of works better, but it doesn't give me the correct error messages. after reaching 5 attempts, it just tells me ⚠️ Request failed with status code 429
+
+
+
+the other errors give me a generic error message without stating how many attempts are left."
+
+22. "first attempt at logging in said 'invalid email or password'
+
+the attempts after that said 'authentication failed'
+
+then, the 5 attempts thing didn't work."
+
+23. "immediately no - still not the right validation errors but it's fine. can you create a text document explaining the issue at hand so we can fix this tomorrow?"
+
+24. "in that text doc you made, can you mention how whenever you attempt login and it doesn't work, the page refreshes which clears all fields which may also impact this? im unsure if that is the case but include it anyway. after that, include all prompts from today's session in the prompts txt file"
+
+25. "there was way more than 7 prompts today, when i say prompts i mean messages i sent to you"
+
+26. "stop thinking that way, i only want you to take all the messages i have sent and put them in the prompts file. don't take action on the promptsi sai"
+
+27. "i said to stop thinking that way, you are trying to answer the prompts. i want you to do nothing but take the messages and put them in the prompts file, do not attempt to solve them."
+
