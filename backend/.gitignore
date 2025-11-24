@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.production
+*.env
+
+# Build outputs
+dist/
+build/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.cursor/
+
+# TypeScript
+*.tsbuildinfo
+
+# Vite cache
+.vite/
+frontend/.vite/
+
+# Testing
+coverage/
+
+# Misc
+.cache/
+temp/
+tmp/

@@ -1,0 +1,16 @@
+-- ========================================
+-- DEPRECATED - Use reset-database-for-testing.sql instead
+-- ========================================
+-- This file is outdated and incomplete.
+-- 
+-- Please use: backend/src/db/reset-database-for-testing.sql
+-- 
+-- The new script includes:
+-- - All new tables (notifications, error logs, etc.)
+-- - Better deletion order
+-- - Verification output
+-- - Safety checks
+-- - Documentation
+--
+-- See: docs/setup/database-reset.md for instructions
+-- ========================================
