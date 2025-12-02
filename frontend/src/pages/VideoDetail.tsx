@@ -5,6 +5,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { formatRelativeTime } from '../lib/dateUtils';
 import { trackRecentlyViewed } from '../lib/indexedDB';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 interface Video {
   id: string;
@@ -610,11 +614,11 @@ export const VideoDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-24 px-8 md:px-16 pb-12">
+    <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-20 sm:pt-24 px-4 sm:px-6 md:px-8 lg:px-16 pb-8 sm:pb-12">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Video Player & Info */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* YouTube Player */}
             <div className="aspect-video bg-black rounded-lg overflow-hidden">
               <iframe
@@ -630,9 +634,9 @@ export const VideoDetail = () => {
             </div>
 
             {/* Video Info */}
-            <div className="bg-white dark:bg-petflix-dark rounded-lg p-6 border border-gray-200 dark:border-transparent">
+            <div className="bg-white dark:bg-petflix-dark rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-transparent">
               <h1 
-                className={`text-3xl font-bold text-charcoal dark:text-white mb-4 cursor-pointer hover:text-petflix-orange transition break-all ${titleExpanded ? '' : 'line-clamp-3'}`}
+                className={`text-xl sm:text-2xl md:text-3xl font-bold text-charcoal dark:text-white mb-3 sm:mb-4 cursor-pointer hover:text-petflix-orange transition break-all ${titleExpanded ? '' : 'line-clamp-3'}`}
                 onClick={() => setTitleExpanded(!titleExpanded)}
                 title={titleExpanded ? "Click to collapse" : "Click to see full title"}
               >
@@ -657,19 +661,19 @@ export const VideoDetail = () => {
             </div>
 
             {/* Comments Section */}
-            <div className="bg-white dark:bg-petflix-dark rounded-lg p-6 border border-gray-200 dark:border-transparent">
-              <h2 className="text-2xl font-bold text-charcoal dark:text-white mb-6">
+            <div className="bg-white dark:bg-petflix-dark rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-transparent">
+              <h2 className="text-xl sm:text-2xl font-bold text-charcoal dark:text-white mb-4 sm:mb-6">
                 💬 Comments ({comments.length})
               </h2>
 
               {user ? (
                 <form onSubmit={handleSubmitComment} className="mb-8">
                   <div className="relative">
-                    <textarea
+                    <Textarea
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
                       placeholder="Add a comment..."
-                      className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded-lg focus:ring-2 focus:ring-petflix-orange focus:outline-none resize-none placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere"
+                      className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white focus:ring-2 focus:ring-petflix-orange resize-none placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere"
                       rows={3}
                       maxLength={280}
                       style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
@@ -681,13 +685,13 @@ export const VideoDetail = () => {
                       </p>
                     </div>
                   </div>
-                  <button
+                  <Button
                     type="submit"
                     disabled={submitting || !newComment.trim() || newComment.length > 280}
-                    className="mt-3 px-6 py-3 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="mt-3 px-6 py-3 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold"
                   >
                     {submitting ? 'Posting...' : 'Post Comment'}
-                  </button>
+                  </Button>
                 </form>
               ) : (
                 <div className="mb-8 p-4 bg-gray-100 dark:bg-petflix-gray rounded-lg border border-gray-300 dark:border-transparent">
@@ -728,10 +732,10 @@ export const VideoDetail = () => {
                             </div>
                             {editingComment === comment.id ? (
                               <div className="mb-3">
-                                <textarea
+                                <Textarea
                                   value={editText}
                                   onChange={(e) => setEditText(e.target.value)}
-                                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded-lg focus:ring-2 focus:ring-petflix-orange focus:outline-none resize-none border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere"
+                                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white focus:ring-2 focus:ring-petflix-orange resize-none border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere"
                                   rows={3}
                                   maxLength={280}
                                   style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
@@ -740,19 +744,22 @@ export const VideoDetail = () => {
                                   {editText.length}/280 characters
                                 </p>
                                 <div className="flex gap-2 mt-2">
-                                  <button
+                                  <Button
                                     onClick={() => handleSaveEdit(comment.id)}
                                     disabled={!editText.trim() || editText.length > 280}
-                                    className="px-4 py-2 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                    size="sm"
+                                    className="px-4 py-2 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold"
                                   >
                                     💾 Save
-                                  </button>
-                                  <button
+                                  </Button>
+                                  <Button
                                     onClick={handleCancelEdit}
-                                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium rounded-lg transition text-sm"
+                                    size="sm"
+                                    variant="outline"
+                                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium"
                                   >
                                     Cancel
-                                  </button>
+                                  </Button>
                                 </div>
                               </div>
                             ) : (
@@ -761,10 +768,12 @@ export const VideoDetail = () => {
                                 
                                 {/* Comment Actions */}
                                 <div className="flex items-center gap-4 mb-3">
-                                  <button
+                                  <Button
                                     onClick={() => handleCommentLike(comment.id)}
                                     disabled={commentLikeLoading[comment.id]}
-                                    className={`flex items-center gap-1 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed ${
+                                    variant="ghost"
+                                    size="sm"
+                                    className={`flex items-center gap-1 text-sm font-medium ${
                                       commentLikes[comment.id]?.liked
                                         ? 'text-petflix-orange hover:text-petflix-red'
                                         : 'text-gray-600 dark:text-gray-400 hover:text-lightblue dark:hover:text-petflix-orange'
@@ -772,31 +781,37 @@ export const VideoDetail = () => {
                                   >
                                     {commentLikeLoading[comment.id] ? '⏳' : commentLikes[comment.id]?.liked ? '❤️' : '🤍'} 
                                     <span>{commentLikes[comment.id]?.count || 0}</span>
-                                  </button>
+                                  </Button>
 
                                   {user && (
-                                    <button
+                                    <Button
                                       onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-lightblue dark:hover:text-petflix-orange font-medium transition"
+                                      variant="ghost"
+                                      size="sm"
+                                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-lightblue dark:hover:text-petflix-orange font-medium"
                                     >
                                       💬 Reply
-                                    </button>
+                                    </Button>
                                   )}
 
                                   {user && user.id === comment.user_id && (
                                     <>
-                                      <button
+                                      <Button
                                         onClick={() => handleEditCommentClick(comment.id, comment.content)}
-                                        className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                                       >
                                         ✏️ Edit
-                                      </button>
-                                      <button
+                                      </Button>
+                                      <Button
                                         onClick={() => handleDeleteCommentClick(comment.id)}
-                                        className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium"
                                       >
                                         🗑️ Delete
-                                      </button>
+                                      </Button>
                                     </>
                                   )}
                                 </div>
@@ -806,11 +821,11 @@ export const VideoDetail = () => {
                             {/* Reply Input */}
                             {replyingTo === comment.id && (
                               <div className="mt-4 mb-4 pl-4 border-l-2 border-petflix-orange dark:border-petflix-orange">
-                                <textarea
+                                <Textarea
                                   value={replyText}
                                   onChange={(e) => setReplyText(e.target.value)}
                                   placeholder={`Reply to @${comment.username}...`}
-                                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded-lg focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange focus:outline-none resize-none border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere"
+                                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange resize-none border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere"
                                   rows={3}
                                   maxLength={280}
                                   style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
@@ -820,22 +835,25 @@ export const VideoDetail = () => {
                                   {replyText.length > 280 && ' - Reply is too long!'}
                                 </p>
                                 <div className="flex gap-2 mt-2">
-                                  <button
+                                  <Button
                                     onClick={() => handleSubmitReply(comment.id)}
                                     disabled={submitting || !replyText.trim() || replyText.length > 280}
-                                    className="px-4 py-2 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                    size="sm"
+                                    className="px-4 py-2 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold"
                                   >
                                     {submitting ? 'Posting...' : 'Post Reply'}
-                                  </button>
-                                  <button
+                                  </Button>
+                                  <Button
                                     onClick={() => {
                                       setReplyingTo(null);
                                       setReplyText('');
                                     }}
-                                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium rounded-lg transition text-sm"
+                                    size="sm"
+                                    variant="outline"
+                                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium"
                                   >
                                     Cancel
-                                  </button>
+                                  </Button>
                                 </div>
                               </div>
                             )}
@@ -862,10 +880,10 @@ export const VideoDetail = () => {
                                       </div>
                                       {editingComment === reply.id ? (
                                         <div className="mb-2">
-                                          <textarea
+                                          <Textarea
                                             value={editText}
                                             onChange={(e) => setEditText(e.target.value)}
-                                            className="w-full px-3 py-2 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded-lg focus:ring-2 focus:ring-petflix-orange focus:outline-none resize-none border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere text-sm"
+                                            className="w-full px-3 py-2 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white focus:ring-2 focus:ring-petflix-orange resize-none border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere text-sm"
                                             rows={2}
                                             maxLength={280}
                                             style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
@@ -874,19 +892,22 @@ export const VideoDetail = () => {
                                             {editText.length}/280 characters
                                           </p>
                                           <div className="flex gap-2 mt-2">
-                                            <button
+                                            <Button
                                               onClick={() => handleSaveEdit(reply.id)}
                                               disabled={!editText.trim() || editText.length > 280}
-                                              className="px-3 py-1 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded transition disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+                                              size="sm"
+                                              className="px-3 py-1 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold text-xs"
                                             >
                                               💾 Save
-                                            </button>
-                                            <button
+                                            </Button>
+                                            <Button
                                               onClick={handleCancelEdit}
-                                              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium rounded transition text-xs"
+                                              size="sm"
+                                              variant="outline"
+                                              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium text-xs"
                                             >
                                               Cancel
-                                            </button>
+                                            </Button>
                                           </div>
                                         </div>
                                       ) : (
@@ -895,10 +916,12 @@ export const VideoDetail = () => {
                                           
                                           {/* Reply Actions */}
                                           <div className="flex items-center gap-3">
-                                            <button
+                                            <Button
                                               onClick={() => handleCommentLike(reply.id)}
                                               disabled={commentLikeLoading[reply.id]}
-                                              className={`flex items-center gap-1 text-xs font-medium transition disabled:opacity-50 disabled:cursor-not-allowed ${
+                                              variant="ghost"
+                                              size="sm"
+                                              className={`flex items-center gap-1 text-xs font-medium ${
                                                 commentLikes[reply.id]?.liked
                                                   ? 'text-petflix-orange hover:text-petflix-red'
                                                   : 'text-gray-600 dark:text-gray-400 hover:text-lightblue dark:hover:text-petflix-orange'
@@ -906,34 +929,40 @@ export const VideoDetail = () => {
                                             >
                                               {commentLikeLoading[reply.id] ? '⏳' : commentLikes[reply.id]?.liked ? '❤️' : '🤍'} 
                                               <span>{commentLikes[reply.id]?.count || 0}</span>
-                                            </button>
+                                            </Button>
 
                                             {user && (
-                                              <button
+                                              <Button
                                                 onClick={() => {
                                                   setReplyingTo(comment.id); // Reply to parent comment
                                                   setReplyText(`@${reply.username} `); // Mention the user
                                                 }}
-                                                className="text-xs text-gray-600 dark:text-gray-400 hover:text-lightblue dark:hover:text-petflix-orange font-medium transition"
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-xs text-gray-600 dark:text-gray-400 hover:text-lightblue dark:hover:text-petflix-orange font-medium"
                                               >
                                                 💬 Reply
-                                              </button>
+                                              </Button>
                                             )}
 
                                             {user && user.id === reply.user_id && (
                                               <>
-                                                <button
+                                                <Button
                                                   onClick={() => handleEditCommentClick(reply.id, reply.content)}
-                                                  className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition"
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                                                 >
                                                   ✏️ Edit
-                                                </button>
-                                                <button
+                                                </Button>
+                                                <Button
                                                   onClick={() => handleDeleteCommentClick(reply.id)}
-                                                  className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition"
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium"
                                                 >
                                                   🗑️ Delete
-                                                </button>
+                                                </Button>
                                               </>
                                             )}
                                           </div>
@@ -956,7 +985,7 @@ export const VideoDetail = () => {
 
           {/* Sidebar Actions */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-petflix-dark rounded-lg p-6 sticky top-24 border border-gray-200 dark:border-transparent">
+            <div className="bg-white dark:bg-petflix-dark rounded-lg p-4 sm:p-6 sticky top-20 sm:top-24 border border-gray-200 dark:border-transparent">
               {/* Stats Section */}
               <div className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="font-bold text-charcoal dark:text-white text-lg mb-4">Stats</h3>
@@ -1009,38 +1038,42 @@ export const VideoDetail = () => {
                   </>
                 )}
 
-                <button 
+                <Button 
                   onClick={handleVideoLike}
                   disabled={videoLikeLoading}
-                  className={`w-full px-4 py-3 font-medium rounded-lg transition ${
+                  variant={videoLiked ? 'default' : 'outline'}
+                  className={`w-full px-4 py-3 font-medium ${
                     videoLiked 
                       ? 'bg-petflix-orange hover:bg-petflix-red text-white' 
                       : 'bg-gray-200 hover:bg-lightblue dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  }`}
                 >
                   {videoLikeLoading ? '⏳' : videoLiked ? '❤️' : '🤍'} {videoLiked ? 'Liked' : 'Like'} ({videoLikeCount})
-                </button>
-                <button 
+                </Button>
+                <Button 
                   onClick={handleOpenPlaylistModal}
-                  className="w-full px-4 py-3 bg-gray-200 hover:bg-lightblue dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white font-medium rounded-lg transition"
+                  variant="outline"
+                  className="w-full px-4 py-3 bg-gray-200 hover:bg-lightblue dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white font-medium"
                 >
                   💾 Add to Playlist
-                </button>
-                <button 
+                </Button>
+                <Button 
                   onClick={handleOpenShareModal}
-                  className="w-full px-4 py-3 bg-gray-200 hover:bg-lightblue dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white font-medium rounded-lg transition"
+                  variant="outline"
+                  className="w-full px-4 py-3 bg-gray-200 hover:bg-lightblue dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white font-medium"
                 >
                   🔗 Share
-                </button>
+                </Button>
                 
                 {/* Only show report button if NOT owner */}
                 {(!user || user.id !== video?.shared_by_user_id) && (
-                  <button 
+                  <Button 
                     onClick={handleOpenReportModal}
-                    className="w-full px-4 py-3 bg-gray-200 hover:bg-red-500 dark:bg-petflix-gray dark:hover:bg-red-600 text-charcoal dark:text-white font-medium rounded-lg transition"
+                    variant="outline"
+                    className="w-full px-4 py-3 bg-gray-200 hover:bg-red-500 dark:bg-petflix-gray dark:hover:bg-red-600 text-charcoal dark:text-white font-medium"
                   >
                     🚨 Report Video
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -1049,321 +1082,288 @@ export const VideoDetail = () => {
       </div>
 
       {/* Add to Playlist Modal */}
-      {showPlaylistModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 px-4">
-          <div className="bg-petflix-dark rounded-lg p-8 max-w-md w-full max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-charcoal dark:text-white">
-                Add to Playlist
-              </h2>
-              <button
-                onClick={() => setShowPlaylistModal(false)}
-                className="text-gray-600 dark:text-gray-400 hover:text-white text-2xl"
-              >
-                ✕
-              </button>
-            </div>
+      <Dialog open={showPlaylistModal} onOpenChange={setShowPlaylistModal}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Add to Playlist</DialogTitle>
+          </DialogHeader>
 
-            {loadingPlaylists ? (
-              <div className="text-center py-8 text-gray-600 dark:text-gray-400">
-                Loading playlists...
-              </div>
-            ) : playlists.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-600 dark:text-gray-400 mb-4">You don't have any playlists yet</p>
-                <Link
-                  to="/playlists"
-                  className="inline-block px-6 py-3 bg-petflix-orange hover:bg-petflix-red text-white font-bold rounded-lg transition"
-                  onClick={() => setShowPlaylistModal(false)}
-                >
+          {loadingPlaylists ? (
+            <div className="text-center py-8 text-gray-600 dark:text-gray-400">
+              Loading playlists...
+            </div>
+          ) : playlists.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">You don't have any playlists yet</p>
+              <Button
+                asChild
+                className="bg-petflix-orange hover:bg-petflix-red text-white font-bold"
+                onClick={() => setShowPlaylistModal(false)}
+              >
+                <Link to="/playlists">
                   Create Your First Playlist
                 </Link>
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="space-y-3 mb-6">
+                {playlists.map((playlist) => (
+                  <label
+                    key={playlist.id}
+                    className="flex items-start gap-3 px-4 py-3 bg-gray-50 dark:bg-petflix-gray hover:bg-gray-100 dark:hover:bg-petflix-gray/80 rounded-lg cursor-pointer transition"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedPlaylistIds.has(playlist.id)}
+                      onChange={() => handleTogglePlaylist(playlist.id)}
+                      className="mt-1 w-5 h-5 rounded border-gray-300 text-lightblue dark:text-petflix-orange focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange cursor-pointer"
+                    />
+                    <div className="flex-1">
+                      <div className="font-semibold text-charcoal dark:text-white">{playlist.name}</div>
+                      {playlist.description && (
+                        <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
+                          {playlist.description}
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                ))}
               </div>
-            ) : (
-              <>
-                <div className="space-y-3 mb-6">
-                  {playlists.map((playlist) => (
-                    <label
-                      key={playlist.id}
-                      className="flex items-start gap-3 px-4 py-3 bg-gray-50 dark:bg-petflix-gray hover:bg-gray-100 dark:hover:bg-petflix-gray/80 rounded-lg cursor-pointer transition"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedPlaylistIds.has(playlist.id)}
-                        onChange={() => handleTogglePlaylist(playlist.id)}
-                        className="mt-1 w-5 h-5 rounded border-gray-300 text-lightblue dark:text-petflix-orange focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange cursor-pointer"
-                      />
-                      <div className="flex-1">
-                        <div className="font-semibold text-charcoal dark:text-white">{playlist.name}</div>
-                        {playlist.description && (
-                          <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
-                            {playlist.description}
-                          </div>
-                        )}
-                      </div>
-                    </label>
-                  ))}
-                </div>
-                
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setShowPlaylistModal(false)}
-                    className="flex-1 px-6 py-3 bg-gray-200 dark:bg-petflix-gray hover:bg-gray-300 dark:hover:bg-petflix-gray/80 text-charcoal dark:text-white font-bold rounded-lg transition"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSaveToPlaylists}
-                    disabled={savingPlaylists}
-                    className="flex-1 px-6 py-3 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {savingPlaylists ? 'Saving...' : 'Save Changes'}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+              
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setShowPlaylistModal(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSaveToPlaylists}
+                  disabled={savingPlaylists}
+                  className="flex-1 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red"
+                >
+                  {savingPlaylists ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Report Video Modal */}
-      {showReportModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 px-4">
-          <div className="bg-white dark:bg-petflix-dark rounded-lg p-8 max-w-md w-full border border-gray-200 dark:border-transparent">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-charcoal dark:text-white">
-                🚨 Report Video
-              </h2>
-              <button
-                onClick={() => setShowReportModal(false)}
-                className="text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-white text-2xl"
+      <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">🚨 Report Video</DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmitReport}>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-charcoal dark:text-gray-300 mb-3">
+                Why are you reporting this video? *
+              </label>
+              <select
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded focus:ring-2 focus:ring-red-600 focus:outline-none border border-gray-300 dark:border-transparent"
+                required
               >
-                ✕
-              </button>
+                <option value="">Select a reason...</option>
+                <option value="hate_speech">Hate Speech</option>
+                <option value="inappropriate_content">Inappropriate Content</option>
+                <option value="spam">Spam</option>
+                <option value="violence">Violence</option>
+                <option value="misleading">Misleading Information</option>
+                <option value="copyright">Copyright Violation</option>
+                <option value="other">Other</option>
+              </select>
             </div>
 
-            <form onSubmit={handleSubmitReport}>
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-charcoal dark:text-gray-300 mb-3">
-                  Why are you reporting this video? *
-                </label>
-                <select
-                  value={reportReason}
-                  onChange={(e) => setReportReason(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded focus:ring-2 focus:ring-red-600 focus:outline-none border border-gray-300 dark:border-transparent"
-                  required
-                >
-                  <option value="">Select a reason...</option>
-                  <option value="hate_speech">Hate Speech</option>
-                  <option value="inappropriate_content">Inappropriate Content</option>
-                  <option value="spam">Spam</option>
-                  <option value="violence">Violence</option>
-                  <option value="misleading">Misleading Information</option>
-                  <option value="copyright">Copyright Violation</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-charcoal dark:text-gray-300 mb-3">
+                Additional Details (Optional)
+              </label>
+              <Textarea
+                value={reportDetails}
+                onChange={(e) => setReportDetails(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white focus:ring-2 focus:ring-red-600 resize-none border border-gray-300 dark:border-transparent"
+                rows={4}
+                maxLength={500}
+                placeholder="Provide any additional context that might help us review this report..."
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                {reportDetails.length}/500 characters
+              </p>
+            </div>
 
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-charcoal dark:text-gray-300 mb-3">
-                  Additional Details (Optional)
-                </label>
-                <textarea
-                  value={reportDetails}
-                  onChange={(e) => setReportDetails(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded focus:ring-2 focus:ring-red-600 focus:outline-none resize-none border border-gray-300 dark:border-transparent"
-                  rows={4}
-                  maxLength={500}
-                  placeholder="Provide any additional context that might help us review this report..."
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                  {reportDetails.length}/500 characters
-                </p>
-              </div>
+            <div className="bg-gray-100 dark:bg-petflix-gray rounded-lg p-4 mb-6 border border-gray-300 dark:border-transparent">
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                <strong className="text-charcoal dark:text-white">Note:</strong> False reports may result in account restrictions. 
+                Reports are reviewed by our moderation team within 24-48 hours.
+              </p>
+            </div>
 
-              <div className="bg-gray-100 dark:bg-petflix-gray rounded-lg p-4 mb-6 border border-gray-300 dark:border-transparent">
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong className="text-charcoal dark:text-white">Note:</strong> False reports may result in account restrictions. 
-                  Reports are reviewed by our moderation team within 24-48 hours.
-                </p>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowReportModal(false)}
-                  className="flex-1 px-4 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium rounded transition"
-                  disabled={submittingReport}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submittingReport || !reportReason}
-                  className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {submittingReport ? 'Submitting...' : 'Submit Report'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                onClick={() => setShowReportModal(false)}
+                variant="outline"
+                className="flex-1"
+                disabled={submittingReport}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={submittingReport || !reportReason}
+                variant="destructive"
+                className="flex-1"
+              >
+                {submittingReport ? 'Submitting...' : 'Submit Report'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Share Modal */}
-      {showShareModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 px-4">
-          <div className="bg-white dark:bg-petflix-dark rounded-lg p-8 max-w-md w-full border border-gray-200 dark:border-transparent">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-charcoal dark:text-white">
-                🔗 Share Video
-              </h2>
-              <button
-                onClick={() => setShowShareModal(false)}
-                className="text-gray-600 dark:text-gray-400 hover:text-white text-2xl"
-              >
-                ✕
-              </button>
+      <Dialog open={showShareModal} onOpenChange={setShowShareModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">🔗 Share Video</DialogTitle>
+          </DialogHeader>
+
+          {generatingShareUrl ? (
+            <div className="text-center py-8">
+              <div className="text-gray-600 dark:text-gray-400">Generating share link...</div>
             </div>
-
-            {generatingShareUrl ? (
-              <div className="text-center py-8">
-                <div className="text-gray-600 dark:text-gray-400">Generating share link...</div>
-              </div>
-            ) : (
-              <>
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-charcoal dark:text-white mb-3">
-                    Share Link
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={shareUrl || `${window.location.origin}/video/${id}`}
-                      readOnly
-                      className="flex-1 px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded border border-gray-300 dark:border-transparent text-sm"
-                    />
-                    <button
-                      onClick={handleCopyShareLink}
-                      className="px-4 py-3 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-medium rounded transition"
-                    >
-                      Copy
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-charcoal dark:text-white mb-3">
-                    Share to Social Media
-                  </label>
-                  <div className="grid grid-cols-3 gap-3">
-                    <button
-                      onClick={handleShareToFacebook}
-                      className="px-4 py-3 bg-[#1877F2] hover:bg-[#166FE5] text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
-                    >
-                      <span className="text-xl">📘</span>
-                      <span>Facebook</span>
-                    </button>
-                    <button
-                      onClick={handleShareToTwitter}
-                      className="px-4 py-3 bg-[#1DA1F2] hover:bg-[#1A91DA] text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
-                    >
-                      <span className="text-xl">🐦</span>
-                      <span>Twitter</span>
-                    </button>
-                    <button
-                      onClick={handleShareToInstagram}
-                      className="px-4 py-3 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] hover:opacity-90 text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
-                    >
-                      <span className="text-xl">📷</span>
-                      <span>Instagram</span>
-                    </button>
-                  </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
-                    Instagram: Link copied to clipboard. Paste it in your post or story.
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => setShowShareModal(false)}
-                  className="w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium rounded transition"
-                >
-                  Close
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Edit Video Modal */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 px-4">
-          <div className="bg-white dark:bg-petflix-dark rounded-lg p-8 max-w-md w-full border border-gray-200 dark:border-transparent">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-charcoal dark:text-white">
-                ✏️ Edit Video
-              </h2>
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="text-gray-600 dark:text-gray-400 hover:text-white text-2xl"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveVideoEdit}>
+          ) : (
+            <>
               <div className="mb-6">
                 <label className="block text-sm font-medium text-charcoal dark:text-white mb-3">
-                  Title *
+                  Share Link
                 </label>
-                <input
-                  type="text"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange focus:outline-none border border-gray-300 dark:border-gray-600"
-                  required
-                  maxLength={255}
-                />
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    value={shareUrl || `${window.location.origin}/video/${id}`}
+                    readOnly
+                    className="flex-1 text-sm"
+                  />
+                  <Button
+                    onClick={handleCopyShareLink}
+                    className="bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red"
+                  >
+                    Copy
+                  </Button>
+                </div>
               </div>
 
               <div className="mb-6">
                 <label className="block text-sm font-medium text-charcoal dark:text-white mb-3">
-                  Description
+                  Share to Social Media
                 </label>
-                <textarea
-                  value={editDescription}
-                  onChange={(e) => setEditDescription(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange focus:outline-none resize-none border border-gray-300 dark:border-gray-600"
-                  rows={4}
-                  maxLength={1000}
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                  {editDescription.length}/1000 characters
+                <div className="grid grid-cols-3 gap-3">
+                  <Button
+                    onClick={handleShareToFacebook}
+                    className="bg-[#1877F2] hover:bg-[#166FE5] text-white flex items-center justify-center gap-2"
+                  >
+                    <span className="text-xl">📘</span>
+                    <span>Facebook</span>
+                  </Button>
+                  <Button
+                    onClick={handleShareToTwitter}
+                    className="bg-[#1DA1F2] hover:bg-[#1A91DA] text-white flex items-center justify-center gap-2"
+                  >
+                    <span className="text-xl">🐦</span>
+                    <span>Twitter</span>
+                  </Button>
+                  <Button
+                    onClick={handleShareToInstagram}
+                    className="bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] hover:opacity-90 text-white flex items-center justify-center gap-2"
+                  >
+                    <span className="text-xl">📷</span>
+                    <span>Instagram</span>
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
+                  Instagram: Link copied to clipboard. Paste it in your post or story.
                 </p>
               </div>
 
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowEditModal(false)}
-                  className="flex-1 px-4 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium rounded transition"
-                  disabled={savingEdit}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={savingEdit || !editTitle.trim()}
-                  className="flex-1 px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {savingEdit ? 'Saving...' : 'Save Changes'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+              <Button
+                onClick={() => setShowShareModal(false)}
+                variant="outline"
+                className="w-full"
+              >
+                Close
+              </Button>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Video Modal */}
+      <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">✏️ Edit Video</DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveVideoEdit}>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-charcoal dark:text-white mb-3">
+                Title *
+              </label>
+              <Input
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="w-full"
+                required
+                maxLength={255}
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-charcoal dark:text-white mb-3">
+                Description
+              </label>
+              <Textarea
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                className="w-full resize-none"
+                rows={4}
+                maxLength={1000}
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                {editDescription.length}/1000 characters
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                onClick={() => setShowEditModal(false)}
+                variant="outline"
+                className="flex-1"
+                disabled={savingEdit}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={savingEdit || !editTitle.trim()}
+                className="flex-1 bg-blue-500 hover:bg-blue-600"
+              >
+                {savingEdit ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

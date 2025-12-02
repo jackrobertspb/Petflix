@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables (explicit)
+.env
+.env.*
+backend/.env
+backend/.env.*
+frontend/.env
+frontend/.env.*
+
+# Certificates and keys
+*.pem
+*.key
+*.crt
+*.p12
+credentials.json
+service-account.json
+
+# Logs
+*.log
+logs/
+error.log
+debug.log
+combined.log
+
+# Secrets
+secrets/
+.secrets
+
+# Build outputs
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temporary files
+*.tmp
+*.temp
+

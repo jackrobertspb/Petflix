@@ -2,107 +2,186 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { usePullToRefresh } from '../hooks/usePullToRefresh';
+import { VideoCardSkeleton } from '../components/LoadingSkeleton';
+import { EmptyState } from '../components/EmptyState';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 interface Video {
   id: string;
   youtube_video_id: string;
   title: string;
   description: string;
-  thumbnail_url: string;
   shared_by_user_id: string;
   username?: string;
+  profile_picture_url?: string;
   created_at: string;
-  view_count?: number;
 }
 
+type FeedMode = 'all' | 'following';
+
 export const Feed = () => {
-  const { user } = useAuth();
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
+  const [feedMode, setFeedMode] = useState<FeedMode>('all');
+  const { user } = useAuth();
 
   useEffect(() => {
-    fetchVideos();
-  }, []);
+    const fetchFeed = async () => {
+      setLoading(true);
+      try {
+        let response;
+        if (feedMode === 'following' && user) {
+          // Fetch videos from followed users
+          response = await api.get(`/follows/${user.id}/feed`);
+          setVideos(response.data.videos || []);
+        } else {
+          // Fetch all videos
+          response = await api.get('/videos?limit=20');
+          setVideos(response.data.videos || []);
+        }
+      } catch (error) {
+        console.error('Failed to load feed:', error);
+        setVideos([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const fetchVideos = async () => {
+    fetchFeed();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [feedMode, user?.id]);
+
+  const handleRefresh = async () => {
+    setLoading(true);
     try {
-      // Try /api/v1/videos first (if baseURL doesn't include /api/v1)
-      // Otherwise try /videos if baseURL already includes /api/v1
-      const response = await api.get('/api/v1/videos').catch(() => 
-        api.get('/videos')
-      );
-      
-      // Handle different response structures
-      const videos = response.data?.videos || response.data || [];
-      setVideos(Array.isArray(videos) ? videos : []);
-    } catch (error: any) {
-      console.error('Failed to fetch videos:', error);
-      console.error('Error details:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        baseURL: api.defaults.baseURL
-      });
-      // Set empty array on error so we show the "no videos" message
-      setVideos([]);
+      let response;
+      if (feedMode === 'following' && user) {
+        response = await api.get(`/follows/${user.id}/feed`);
+        setVideos(response.data.videos || []);
+      } else {
+        response = await api.get('/videos?limit=20');
+        setVideos(response.data.videos || []);
+      }
+    } catch (error) {
+      console.error('Failed to refresh feed:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-cream-light dark:bg-petflix-black flex items-center justify-center">
-        <div className="text-petflix-orange text-xl">Loading...</div>
-      </div>
-    );
-  }
+  const containerRef = usePullToRefresh({
+    onRefresh: handleRefresh,
+    enabled: !loading
+  });
 
   return (
-    <div className="min-h-screen bg-cream-light dark:bg-petflix-black">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-charcoal dark:text-cream-light mb-8">
-          Petflix Feed
-        </h1>
-        
-        {videos.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-charcoal dark:text-cream-light text-lg">
-              No videos yet. Be the first to share a video!
+    <div ref={containerRef} className="min-h-screen bg-cream-light dark:bg-petflix-black pt-20 sm:pt-24 px-4 sm:px-6 md:px-8 lg:px-16">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
+          <div>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-charcoal dark:text-white mb-2">
+              Your Feed 🎬
+            </h1>
+            <p className="text-sm sm:text-base text-gray-700 dark:text-gray-400">
+              {feedMode === 'following' ? 'Videos from users you follow' : 'All shared videos'}
             </p>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {videos.map((video) => (
-              <Link
-                key={video.id}
-                to={`/video/${video.id}`}
-                className="block bg-white dark:bg-petflix-dark rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
-              >
-                <img
-                  src={video.thumbnail_url}
-                  alt={video.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-charcoal dark:text-cream-light mb-2 line-clamp-2">
-                    {video.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-petflix-gray line-clamp-2">
-                    {video.description}
-                  </p>
-                  {video.username && (
-                    <p className="text-xs text-petflix-orange mt-2">
-                      by {video.username}
-                    </p>
-                  )}
-                </div>
-              </Link>
-            ))}
+          
+          {/* Toggle between All and Following */}
+          <div className="flex gap-2 bg-white dark:bg-petflix-dark-gray rounded-lg p-1 border border-gray-300 dark:border-gray-700 shadow-sm">
+            <Button
+              onClick={() => setFeedMode('all')}
+              variant={feedMode === 'all' ? 'default' : 'ghost'}
+              className={`px-6 py-2 font-medium ${
+                feedMode === 'all'
+                  ? 'bg-petflix-orange text-charcoal dark:text-white hover:bg-petflix-orange/90'
+                  : ''
+              }`}
+            >
+              All Videos
+            </Button>
+            <Button
+              onClick={() => setFeedMode('following')}
+              variant={feedMode === 'following' ? 'default' : 'ghost'}
+              className={`px-6 py-2 font-medium ${
+                feedMode === 'following'
+                  ? 'bg-petflix-orange text-charcoal dark:text-white hover:bg-petflix-orange/90'
+                  : ''
+              }`}
+              disabled={!user}
+            >
+              Following
+            </Button>
           </div>
-        )}
+        </div>
       </div>
+
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <VideoCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : videos.length === 0 ? (
+        <EmptyState
+          icon={feedMode === 'following' ? '👥' : '📺'}
+          title={feedMode === 'following' ? 'No Videos from Followed Users' : 'Your Feed is Empty'}
+          description={
+            feedMode === 'following'
+              ? 'Follow other users to see their shared videos here!'
+              : 'Be the first to share a video or search for pet videos to add to your feed.'
+          }
+          actionText="Browse Videos"
+          actionLink="/search"
+        />
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-3">
+          {videos.map((video) => (
+            <Card
+              key={video.id}
+              className="group relative overflow-hidden transition-transform duration-200 ease-out hover:scale-105 hover:z-10 border-gray-200/50 dark:border-gray-800/30 shadow-md hover:shadow-xl p-0"
+            >
+              <Link
+                to={`/video/${video.id}`}
+                className="block"
+              >
+                <CardContent className="p-0">
+                  {/* Thumbnail Container with 16:9 Aspect Ratio */}
+                  <div className="relative w-full pb-[56.25%] bg-white dark:bg-petflix-dark-gray">
+                    <img
+                      src={`https://img.youtube.com/vi/${video.youtube_video_id}/hqdefault.jpg`}
+                      alt={video.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      loading="lazy"
+                      onError={(e) => {
+                        // Fallback to medium quality if high quality fails
+                        const target = e.target as HTMLImageElement;
+                        if (target.src.includes('hqdefault')) {
+                          target.src = `https://img.youtube.com/vi/${video.youtube_video_id}/mqdefault.jpg`;
+                        }
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Info Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="absolute bottom-0 left-0 right-0 p-3">
+                      <h3 className="font-bold text-white text-xs md:text-sm line-clamp-2 mb-1">
+                        {video.title}
+                      </h3>
+                      {video.username && (
+                        <p className="text-xs text-gray-700 dark:text-gray-300">@{video.username}</p>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Link>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
-
