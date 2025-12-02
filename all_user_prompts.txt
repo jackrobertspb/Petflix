@@ -1,0 +1,2452 @@
+=== cursor_getting_the_project_up_and_runni.md ===
+how do i get this project running? i have my env configured
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+whenever i click on http://localhost:5173/ it gives me the updated current version of the site, then when i click 'tests' it takes me to the error page. then, if i hard refresh, it takes me to an old version of the site?
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+its still showing an old version, could this be because i accidentally opened and ran an old version of the project before running this one?
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+why dont we just terminate the other version
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+issue here, where text can go outside the box. make the text wrap
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+make this delete confirmation for the playlist delete an actual modal in the site, not browser
+
+while youre at it, can you tell me what all browser pop ups are and then get rid of them, replace them with actual modals in site
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+i added two videos to a playlist but i see none. there are no error logs beside these
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+is this (1st image) a cause for concern? the second image is the logs
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+Reorder Playlist Videos
+
+
+
+
+
+this does not work at all, when i try to drag its like im dragging a link or smth. for these videos, add a little hamburger thing at the side (3 small horizontal lines that you can drag the videos by)
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+good but u dont need a toast notification for that
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+how do i test playlist tags give me step by step
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+yeah do that
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+is there any better way to implement this?
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+i get this error when trying to add a tag
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+there is no characters other than the 3 lettters here but its giving e this error
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+i get this error
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+when i add a tag, it comes up as 'object_object' and then i cant add any other tags after that because it thinks the tag i am trying to ad is object object
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+theytre still coming up as object object
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+this is what i see when addinga  tag
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+its still showing object object
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+fix it
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+is it ideal to have tags showing on the video? cuz it gets clogged easily. maybejust remove that section and have it below these stats
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+getting this when i try to change pfp
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+it works but it doesnt save
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+whne i refresh it still shows the old pfp
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+this seems important
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+not working
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+still getting these
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+ok the profile pciture function isnt working, it literally isnt saving. it shows me the image replacing the paws, then i refresh and it shows me the paws again.
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+its still not sticking, why? am i doing something wrong?
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+these are the logs, is this all good?
+
+second img is what i get when i upload
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+the profile picture is saving technically but it isnt staying? anytime i refresh it just shows the placeholder again
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+ok so i figured out that it WORKS but it takes time to update on the profile section, why?
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+it changes automatically on profile but not edit profile
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+i get this when trying to change my email even though i havent changed it
+
+is this because i signed up with the email so the cooldown started?
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+is 7 days not what the prd states
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+i changed my emial and it reset my bio, then when i refreshed the page my bio and emial field were empty
+
+
+=== cursor_getting_the_project_up_and_runni.md ===
+theres no cooldown, it didnt email me anything, and i didnt have to click anything to verify the change
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+Can you look through the entire project, then look at the PRD and tell me what is missing please.
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+yes, tell me what is left to do
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+To-do's from the plan have already been created. Do not create them again. Mark them as in_progress as you work, starting with the first one. Don't stop until you have completed all the to-dos.
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+i don't seem to have a backend of a frontend .env
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+what do i need to do in the env? the formatting of your message broke and it is not legible
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+okay, i've filled that in - what do i do now?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+@node (20-35)
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+@node (42-56) 
+
+@.env (54-58) this is my vapid stuf
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+They do match exactly @.env (55-57)
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+@node (29-48) 
+
+
+
+this is what i get doing ctrl+c and then npm run dev in backend
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+@node (50-70) 
+
+what does it mean? it syas vapid public key should be 65 bytes long?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+BONrhu_8EtFLFYIibyZkAgbrfZbRQlUATZeYdDdHCaa9A8Jl1i4kMQ1tcy8a22eHDwPMJtXsI3C_BecCorpn5ZI
+
+how many characters is this?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+okay what now
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+@node (74-93) 
+
+i commented them out but still get this
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+okay well i completely forgot to save the file after adding the vapid keys so oops
+
+what#'s next
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+i get this opening console and when i open the site it says 
+
+🐾💔
+
+Oops! Something went wrong
+
+We encountered an unexpected error. Please refresh the page to try again.
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+still getting errors
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+the skip button looks kind of out of place and makes this box feel cluttered, what can we do?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+you can get rid of the percentage, and the skip isnt positioned correctly, nor is it capitalised? i want it to look good
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+significantly better, okay
+
+can you go through the ENTIRE site (absolutely everything, do not miss a single line) and tell me what we have in comparison to what is stated in the prd attached to this message? @c:\Users\jack\Downloads\petflix-prd-2025-11-10 (2).md 
+
+
+
+if there is no inconsistencies and there is no scope creep (make sure of this) then we can move on to the next part
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+now the next stage
+
+some notes i was given that othe people didnt pick up on for this project that i should
+
+
+
+security issues, we need to ignore .env and stuff
+
+documentation was scattered, we need ours to be clean
+
+we need a frontend and backend folder only but no api one
+
+we need a search toggle between petflix uploaded videos and youtube's api
+
+we need to categorise the api call to return pets when searching youtube's api
+
+
+
+can you make a plan for this?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+1. B works, a dropdown/radio toggle is ideal. 
+
+2. A works best I believe.
+
+3. What do you think is the best here?
+
+4. What do you think is best for security?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+you can remove all the old and outdated debug logs/test reports, and for question 4 option A works. 
+
+
+
+if we were to remove all outdated documents, what would you choose then>?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+that works for me, what now?
+
+ go ahead with this
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+looks kind of ugly to me, how do we make it look better?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+doesnt look better, too cramped
+
+can you add it to the search bar as a drop down? like this, but replace the X with a drop down
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+looks better but there's some visual issues, the arrow is too close to the border and the drop down is ugly, can we make it a custom one
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+im getting some errors when i try to search
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+still getting errors
+
+i changed the frontend to 5001 and saved it
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+is there any more hlepful logs i can provide anywhere?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+backend is port 5002
+
+@.env (1-2)  this is frontend
+
+the backend terminal is only giving me notification logs and the frontend temrinal  @cmd (26-50)  shows this
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+i changed the frontend to say VITE_API_URL=http://localhost:5002/api/v1 , saved it and hard refrehsed and im still getting these errors
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+now i have this? pasting that command in shows this
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+im still getting these errors??
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+what is the issue here? what is going on? we are going around in circles
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+okay it decides to work in incognito? moving on, the search doesnt actually function. i search 'dogs' on youtube search and there is no results - why?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+no, i have a youtube api key there @.env (18-19)
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+@node (986-1011) got this error when doing npm rundev
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+i searched 'dog' and nothing came up, still.
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+@Cursor (cd C:\Users\jack\Downlo...) (218-229)
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+AIzaSyCsLwab4n_J3HtqAV9g67Ng6pdRhGGGyQc
+
+THIS IS THE KEY
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+ive pasted it into env, what now?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+it works but it certainly isnt pet videos
+
+on another note, quickly, can we get rid of the notification logs? they are clogging the backend console logs and redundant
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+okay it works now - was there anything i needed to test before we went into this issue
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+are you able to do a full thorough e2e of me? will it be reliable and trustworthy?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+go do the reliable stuff and report back
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+okay, give me a full thorough test sheet please
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+can  you actually make it on the http://localhost:5173/test-checklist page? replace all the stuff on that with this test?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+we need to clean this up soon
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+how do i delete users?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+can you make a script that i can run to completely remove all users and reset the entire db? i want it so it is completely fresh for testing
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+Error: Failed to run sql query: ERROR: 42P01: relation "anomaly_detection_config" does not exist LINE 33: DELETE FROM anomaly_detection_config; ^
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+okay, can you get rid of these?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+found an issue, when you middle click a navbar item to open in a new tab, the tutorial shows up again even if youve completed it
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+can we configure emails? thats a key part
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+resend ideally
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+how do i get the api key?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+so how do i get my api key? if its hidden?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+those are old emails, ignore them. what do i name the new api key
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+ok ive added it, now what
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+i signed up using jack+2@pixelbeard.co and didnt get an email, is this because you can only send emails to the one you signed up with? i signed upo with jack@pixelbeard.co, no +2
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+ihave to delete that user, give me a command to run in sql editor for that
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+i registered with jack@Pixelbeard.co and got no email
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+nothing came up in the backend unless im looking in the wrong place, how do i find the right one?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+@Cursor (cd backend) (1-11)  is this the backend?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+i said to get rid of the notification logs@Cursor (cd backend;) (22-24)
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+@Cursor (cd backend;) (18-74) 
+
+it says this but i got no email?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+@.env (36-43) 
+this is what my env is. is that right?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+this is what it says
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+im done, restart them
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+it works, perfect
+
+looks a bit weird though, can you make it look more like petflix's dark mode theme?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+is this for registration email only or other emails?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+looks a bit ugly, can we change it to petflix's light mode branding instead
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+can we add a coodlown to the like button, the same that the follow button has
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+can you make the validation error for sharing an invalid url more clear? this isnt ideal
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+whenever i post a comment, it shows that it was psoted 15 seconds ago and starts from there instead of from 0 seconds?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+logs
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+yeah it shows just now, now
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+randomly getting search failed alongside loads of weird notification
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+CAN WE MAKE the delete video confirmation modal not a part of a browser pop up but rather a pop up in the website? looks btter like that, the browser pop ups are ugly
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+how do i check view count? i don't see anywhere on the site for that
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+can we get a more detailed validation error for a comment over 280 characters?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+this is an issue
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+what? it is not over 280 charcaters, its the fact that its going past the text box
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+still not working
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+works perfect, can we add a reply button to a reply? i wanna be able to reply to a reply, but dont make it make another indent/thread - can we do it so it has the @ of the user whos reply is being replied to at the start?
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+you cant edit your own comment, jsut delete
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+plugin:vite:react-babel] C:\Users\jack\Downloads\Petflix-main\frontend\src\pages\VideoDetail.tsx: Identifier 'handleSaveEdit' has already been declared. (544:8)
+
+
+
+  547 |
+
+C:/Users/jack/Downloads/Petflix-main/frontend/src/pages/VideoDetail.tsx:544:8
+
+542 |    };
+
+543 |  
+
+544 |    const handleSaveEdit = async (e: React.FormEvent) => {
+
+    |          ^
+
+545 |      e.preventDefault();
+
+546 |      if (!editTitle.trim() || !id) return 
+
+
+
+i get this when loading my page
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+can you seed a user with 20 videos for me that i can follow and teest this for
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+the videos still sh ow in my feed even after unfollowing
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+cjange it back to all by defualt, thats fine
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+user profiles don't have playlists anywehere
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+there needs to be some padding below this playlist box so it isn't touching the bottom of the screen if that makes sense
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+can you give petlover some playlists
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+can you put videos in the playlists
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+i see no videos are these logs related
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+this is the console
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+are these important issues? it works now btw
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+the view count still isnt inmplemented
+
+
+=== cursor_review_project_against_prd_for_g.md ===
+if i refresh once the views sometimes go up by more than one, why? would it not make more sense for a view to only be counted once per user? or would a solution to this be adding a cooldown to every view?
+
+
+=== cursor_review_project_status_against_pr.md ===
+Review what is currently in the project vs what is listed in the PRD. Tell me what is missing from the PRD.
+
+
+=== cursor_review_project_status_against_pr.md ===
+can you expand on the high priority ones and then once i give you the go ahead, make a start
+
+
+=== cursor_review_project_status_against_pr.md ===
+i see you mention aws but we are using supabase remember? look through everything, including details like that
+
+
+=== cursor_review_project_status_against_pr.md ===
+ok so what do we need to do
+
+
+=== cursor_review_project_status_against_pr.md ===
+yeah go with resend
+
+
+=== cursor_review_project_status_against_pr.md ===
+does it need to be resend or can it just be done in supabase?
+
+
+=== cursor_review_project_status_against_pr.md ===
+can i make it so its using supabase auth instead of jwt or does that not change anything
+
+
+=== cursor_review_project_status_against_pr.md ===
+tell me what to do one step at a time, once i message saying im ready for the next step give it to me
+
+
+=== cursor_review_project_status_against_pr.md ===
+ready for step 2
+
+heres the api key
+
+re_Hw3sDnB6_Dd3EGtFnCG4ykC3GEdV77NYd
+
+
+=== cursor_review_project_status_against_pr.md ===
+ready for step 3
+
+
+=== cursor_review_project_status_against_pr.md ===
+testing this now, but the site needs some work - can you have it automatically start in dark mode? also, im not sure if its jsut because its on light mode or if its because it isnt there but i dont see the previous button on stage 1. i remember asking you to make the previous button visible but grayed out on step 1. also make the 'skip' button look better, by putting it into a box with rounded corners and all
+
+
+=== cursor_review_project_status_against_pr.md ===
+it still looks like this for me even after hard refreshing
+
+
+=== cursor_review_project_status_against_pr.md ===
+is it on http://localhost:5173/? whenever i try to laod it on chrome i get this error
+
+
+=== cursor_review_project_status_against_pr.md ===
+ok much better, one nitpick tho - the border makes the box bigger so it looks odd when u go to the next card. fix that and ill test the email registration
+
+
+=== cursor_review_project_status_against_pr.md ===
+you can just get rid of the border
+
+
+=== cursor_review_project_status_against_pr.md ===
+i didnt get the email
+
+
+=== cursor_review_project_status_against_pr.md ===
+@esbuild (44-56) 
+
+is this cuz i used the email jack+email@pixelbeard.co?
+
+
+=== cursor_review_project_status_against_pr.md ===
+can you wipe the database then so i can make the account
+
+
+=== cursor_review_project_status_against_pr.md ===
+how do i delete a specific user?
+
+
+=== cursor_review_project_status_against_pr.md ===
+okay, i got the email - was that all i needed to test for that step?
+
+
+=== cursor_review_project_status_against_pr.md ===
+@node (9-15)
+
+
+=== cursor_review_project_status_against_pr.md ===
+worked but i got this - this can be removed now right?
+
+
+=== cursor_review_project_status_against_pr.md ===
+can we make sure this doesnt pop up on the reset password screen? or, make it so it only shows up when you are a logged in user OR on the dashboard
+
+does that make snese?
+
+
+=== cursor_review_project_status_against_pr.md ===
+on password reset page cna you add password visibility tokens
+
+
+=== cursor_review_project_status_against_pr.md ===
+can you make the 'install petflix' popup have a 'dont ask me again' toggle?
+
+
+=== cursor_review_project_status_against_pr.md ===
+restart the backend and frontend please
+
+
+=== cursor_review_project_status_against_pr.md ===
+cahn you make the instlal prompt onlky occur when you log in
+
+
+=== cursor_review_project_status_against_pr.md ===
+also make it so when you login youre always redirected to dashboard
+
+
+=== cursor_review_project_status_against_pr.md ===
+restart frontend and backend so i can test
+
+
+=== cursor_review_project_status_against_pr.md ===
+ok well it redirected me to feed, not dashboard
+
+
+=== cursor_review_project_status_against_pr.md ===
+dont use /dashboard, its literally just http://localhost:5173/
+
+
+=== cursor_review_project_status_against_pr.md ===
+worked, now we need to move on  to the next step, remember earlier?
+
+
+=== cursor_review_project_status_against_pr.md ===
+how do i test this?
+
+
+=== cursor_review_project_status_against_pr.md ===
+how is it gonna work in the search bar? can i hypothetically change relevance to 'recent' and click search and have all videos show starting with most recent?
+
+
+=== cursor_review_project_status_against_pr.md ===
+@node (4-22)
+
+
+=== cursor_review_project_status_against_pr.md ===
+what does engagement mean?
+
+
+=== cursor_review_project_status_against_pr.md ===
+is that in the prd
+
+
+=== cursor_review_project_status_against_pr.md ===
+what exactly does the prd state?
+
+
+=== cursor_review_project_status_against_pr.md ===
+okay, what's next?
+
+
+=== cursor_review_project_status_against_pr.md ===
+yeah do that
+
+
+=== cursor_review_project_status_against_pr.md ===
+whats next
+
+
+=== cursor_review_project_status_against_pr.md ===
+explain what that is please
+
+
+=== cursor_review_project_status_against_pr.md ===
+does this mean there will be a notification tab that will have a (1) when you're on the site to let you know you have a notification or will there not be
+
+
+=== cursor_review_project_status_against_pr.md ===
+okay go ahead and implement that, then restart frontend and backend
+
+can you restart frontend and backend after each new feature is implemented?
+
+
+=== cursor_review_project_status_against_pr.md ===
+how do i test this
+
+
+=== cursor_review_project_status_against_pr.md ===
+seems to work, but if you follow someone and unfollow them and attempt to refollow thme you get this issue
+
+
+=== cursor_review_project_status_against_pr.md ===
+is profile picture meant to be a url? makes more sense to just be able to upload it as a picture
+
+
+=== cursor_review_project_status_against_pr.md ===
+is there any way to prevent the user from spam clicking follow/unfollow? also change the rate lmiit message to a more clear message letting the user know to try again soon please
+
+
+=== cursor_review_project_status_against_pr.md ===
+what do these errors mean
+
+
+=== cursor_review_project_status_against_pr.md ===
+ok whats next?
+
+
+=== cursor_review_project_status_against_pr.md ===
+go ahead with notification grouping, then can you add a button to the navbar that lets me test this? give it the function of getting like 5 likes on a video, 2 comments and 3 follows
+
+
+=== cursor_review_project_status_against_pr.md ===
+i havent got anything yet how do i check its workuing? got this erorr in log@node (42-59)
+
+
+=== cursor_review_project_status_against_pr.md ===
+@node (84-96) these too
+
+
+=== cursor_review_project_status_against_pr.md ===
+why do i need to wait up to 5 minutes?
+
+
+=== cursor_review_project_status_against_pr.md ===
+its still not working, how do i test that evertything is functioning as intended to pinpoint why it isnt working
+
+
+=== cursor_review_project_status_against_pr.md ===
+just a clarification, is this in this prd?@c:\Users\jack\Downloads\petflix-prd-2025-11-10 (7).md  
+
+when i say this i mean notification grouping
+
+
+=== cursor_review_project_status_against_pr.md ===
+im still not receiving the notificaitons even after lcicking the test button
+
+
+=== cursor_review_project_status_against_pr.md ===
+i ddi just randomly get a pop up saying 2 people liked my video but then i checked the notification button and it had nothing there?
+
+
+=== cursor_review_project_status_against_pr.md ===
+ok restart the backend and then ill test
+
+
+=== cursor_review_project_status_against_pr.md ===
+i pushed but no notifications showed up in the bell section
+
+
+=== cursor_review_project_status_against_pr.md ===
+this is my full browser console@node (50-56) 
+
+and this is jsut repeating in my backend
+
+
+=== cursor_review_project_status_against_pr.md ===
+@node (36-52)  this is what i see
+
+
+=== cursor_review_project_status_against_pr.md ===
+@node (69-87) this is what i see
+
+@node (69-87)  i see this, i also ran the migration
+
+
+=== cursor_review_project_status_against_pr.md ===
+this just appeared alongside 14 new comments and 21 new followers, any idea why?
+
+i also have this now
+
+
+=== cursor_review_project_status_against_pr.md ===
+maybe it did this because it wasnt actually taking 30 seconds but 5 mintues?
+
+
+=== cursor_review_project_status_against_pr.md ===
+ok nvm thats wrong, whats next
+
+
+=== cursor_review_project_status_against_pr.md ===
+go ahead with search result relevance and then can you just do all the medium priority in one? then after you've done that, i want you to do a full e2e test of the site for every possible scenario and report what isnt working back please
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+go through the entire project and tell me what is left to do
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+go ahead with the env files
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+this is what i got after step 1, is this correct? if so, tell me what to do next again
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+where do i find notepad .env
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+one question, are you SURE i need to do all this stuff? are you just making me do this due to  being unable to access the current .env with all this stuff inside it? because last i remember, this was done
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+can you undo everything you made me just do then?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+now that this is cleared up, what is actually next to do?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+ok it runs but lets fix light mode because it currently looks like this
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+much better - now, for some clarification
+
+currently, making a post requires you to use a link from youtube, then a title, then description.
+
+
+
+the other idea i had for how this works is you would be able to search youtube's api when sharing a video, and this would work more as a post as opposed to an upload (i.e no description or title, just a caption)
+
+
+
+i have spoken to the person who assigned me this task and we considered that the current method may not be the correct way to do this, but didn't come to a real decision so i would like you to tell me if this is correct or if the other idea i had was correct.
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i need you to look into the prd and tell me if there is any specific way stated, not give a recommendation - if there is no actual specification on this, we will go with the hybrid but in a different way as to what you suggested
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i'll get back to you on this, lets move on to whatevers next for now
+
+let me know what needs to be done next
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+is light mode not already fixed? if it isn't go ahead, tell me what you change
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+light mode is definitely not fixed, you need to account for stuff like this , ESPECIALLY text contrast
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+getting closer but i need you to do this sitewide, this issue with black boxes and gray text is still prevalent on playlists, search etc
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+just one nitpick, on playlists
+
+when you switch from dark to light mode, the 'private' text changes from bright on dark mode to dark on light mode - this doesnt need to change though, as the background of the box its in doesn't change. first pic is dark mode, second is light. 
+
+
+
+the change in colour makes it a little less readable in my opinion
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+ok perfect, what's next?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+ok first of all, the search function needs to be fixed - it shouldn't be searchign youtube's api, just petflix's database
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i get this warning when searching, why?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+still not fixed
+
+here is the console
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+that's fixed now, what next?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+for the video sharing clarification, we can leave it as it is
+
+the followed users feed works fine
+
+you can comment on videos if thats waht 4 means, and the embedded youtube player also works.
+
+ 
+
+you can add videos to playlist but there is no toast notification letting you know that this was successful + it could do with some cleaning up, by allowing you to select multiple playlists and then click a 'save' or 'confirm' button to save it. 
+
+you can view other people's profile fine
+
+you can report videos fine, although im not sure what this actually does? does this function actually do anything other than give a notification?
+
+
+
+for the nice to have section, are these scope creep? i want no scope creep on this project, need it to be faithful to the scope.
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+quickly give me a rundown of what you just did please
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+instead of having it notify you when this video is already in playlists, maybe do something similar to what youtube does?
+
+
+
+let's say this video is in 'testt' already. once you go to 'add to playlist', 'testt' will be ticked already and the others wont be. if you untick testt, the video will be removed from that playlist. that way, users will know if a video is already in the playlist or not.
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+okay that's better, what is next then?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+what about sorting settings out?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+this is currently what shows on the settings page and this is all i see in console.
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+for some reason, my cursor disappears behind the text box when i hover over it? also can you make sure everything in settings is accurate to the scope?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+the cursor is still disappearing
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+still not visible? this only happens on my monitor though, on my laptop screen the cursor is visbale
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+you cna undo these things, that wa sjust an issue with my mouse for some reason but changing the text select mouse state to beam_r fixed it
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+can we do something about the boxes being ugly sitewide?the gray box on black bg looks really bad, id like it to maybe follow a similar pattern to light mode where the colours arent so close to each other
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+one issue ive noticed is this
+
+the images here arent loading, is there any reason?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+k what's next?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+what is the manifest json?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+yes go ahead you can do that
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+im on opera, will i see the install prompt there?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i opened it on edge and don't see an install prompt anywhere on the page
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+this is what i see in my console
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+this is what i see in manifest
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+give me a command to open Petflix-Frontend/public/create-placeholder-icons.html
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i cant install it still
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+is this any help
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i got the install button, so now what?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+if i turn wifi off, what should i be able to see?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+whats next
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+go ahead with push notifications then
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+im trying to upload a video and getting a network error, is this an error on my end or on the code?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+rerun that curl command, it wasnt working and you got stuck
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+how do i ensure that this isnt an error on my end but rather a code issue?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+getting this now
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+what do these errors mean?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+its still giving me the network error when i do this, are you 100% sure this isn't on my end?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+finally worked, can you fix the contrast on this though and make it look better? it looks good on dark mode (second pic)
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+this looks really bad on light mode
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+how do i test push notifications? i had another account follow an account i was logged into and nothing came up, tell me how
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+clicking the enable notifications button gives me a modal asking if i want to allow notifications, and when i click yes it does nothing - trying to enable notifications doesnt do anything too, it just keeps the button as inactive
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+that wasnt the issue, the button state literally isnt changing from inactive to active when i click it
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i clicked the button and for the first time, it turned gray -> yellow, but it stayed yellow. when i refreshed, i tried clicking it again (it was gray) but it didnt do anything and console showed nothing
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i randomly got this error a load of times?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i get this error when i try to enable notifications, but im not getting asked to enable notifications?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i enabled notifications, and got this
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+heres my console, what does this mean and what do i need to do to fix it?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+they were old logs, use these instead
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+it didnt trigger the pop up, just this
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+this is what i get after enabling notifications for the site
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+this is what i get now
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+still getting this? im using edge if that helps
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+it says default even though i just enabled notificatinos, should i switch browsers?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+give me the login of a dummy account
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i followed the account with push notifications from the dummy account and got no notification
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+im unsure how to check backend terminal but this is all fine so far?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i got no notification when running fetch('http://localhost:5002/api/v1/push/subscribe', {
+
+  method: 'POST',
+
+  headers: {
+
+    'Content-Type': 'application/json',
+
+    'Authorization': 'Bearer ' + localStorage.getItem('token')
+
+  },
+
+  body: JSON.stringify({
+
+    endpoint: 'https://fcm.googleapis.com/fcm/send/fEO_BxnQg38:APA91bFN5fzotFZtAvDTMDf7...',
+
+    keys: {
+
+      p256dh: 'test',
+
+      auth: 'test'
+
+    }
+
+  })
+
+})
+
+.then(r => r.json())
+
+.then(d => console.log('Save result:', d))
+
+.catch(e => console.log('Save error:', e));
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i see no notification pop up
+
+notifications are allowed though
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+it worked i got the notification
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+the notifications work but if i unfollow and refollow i only get the follow notification once
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+the other notification types work, what else is there to do?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+sort password change and account deletion and come back to me
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+they both work, what next?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+before any of this i need you to look through EVERYTHING and tell me if this isn't in the scope - whether this is files or features, just let me know.
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+go ahead and delete the unnecessary files but make sure you keep the prompts file, that is important and im just ensuring you do.
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+okay now, give me the next steps - is it testing and polishing? if so, give me a detailed test sheet to go through and add it to the navbar for me, as a checklist.
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+immediately i've found a big security issue, where in the scope it states that if an email is already registered you shouldn't be able to sign up with it BUT it shouldn't tell you that the email is already registered, as that is a potential security risk. can you go through the entire scope again and keep an eye out for all of these minor things?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+do number 1 first, then get back to me after that and tell me what to test. after that, we will move onto the other to-dos
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+these all worked fine, let's move on
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i ran 
+
+CREATE TABLE IF NOT EXISTS video_likes (
+
+
+
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
+  video_id UUID NOT NULL REFERENCES videos(id) ON DELETE CASCADE,
+
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (user_id, video_id)
+
+);
+
+CREATE TABLE IF NOT EXISTS comment_likes (
+
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
+  comment_id UUID NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
+
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (user_id, comment_id)
+
+);
+
+CREATE INDEX IF NOT EXISTS idx_video_likes_video_id ON video_likes(video_id);
+
+CREATE INDEX IF NOT EXISTS idx_video_likes_user_id ON video_likes(user_id);
+
+CREATE INDEX IF NOT EXISTS idx_comment_likes_comment_id ON comment_likes(comment_id);
+
+CREATE INDEX IF NOT EXISTS idx_comment_likes_user_id ON comment_likes(user_id);
+
+
+
+in sql editor in supabase and it returned 'success. no rows returned'
+
+is this expected?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i can like comments and videos now, as well as delete my own comments. are these meant to send notifications? if so, what notifications am i supposed to get and from what?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+i didnt get a notification from my video getting liked - also, when i am viewing my own post should i be able to edit/delete it or is it a read only state?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+issue here
+
+make it so the text doesnt go past 2 lines on top, if it does make it end in a ...
+
+same with the description, except you can just make the text wrap for the description
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+closer with the title but it needs to end in ... which it doesnt here
+
+can you make it end in ... after say 20 characters?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+is it best to have it end in ... or is it better to just do line breaks
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+use line-clamp-3 but then allow users to click the title to see it all
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+the click to expand works but not the 3 lines. this is what happens when i click
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+much better, the delete/edit function works but im still not getting like notifications. even though account b is liking the account a video and account a has notifications turned on. what do i need to do to debug this issue?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+how do i find the backend terminal?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+@node (6-34) 
+
+
+
+how do i find the terminal that the backend is already running on?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+it works now, what is next to do?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+isnt the tv casting already implemented due to the videos being taken from youtube using the api?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+go ahead with the high priority then
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+on the login page, i have a complaint
+
+when you attempt to login, it refreshes the page and then clears the email field if the login is wrong
+
+this just makes it inconvenient
+
+
+
+also, the 5 tries thing doesn't work. i can try infinitely
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+okay it kind of works better, but it doesn't give me the correct error messages. after reaching 5 attempts, it just tells me ⚠️ Request failed with status code 429
+
+
+
+the other errors give me a generic error message without stating how many attempts are left.
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+first attempt at logging in said 'invalid email or password'
+
+the attempts after that said 'authentication failed'
+
+then, the 5 attempts thing didn't work.
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+immediately no - still not the right validation errors but it's fine. can you create a text document explaining the issue at hand so we can fix this tomorrow?
+
+
+=== cursor_review_project_tasks_and_next_st (1).md ===
+in that text doc you made, can you mention how whenever you attempt login and it doesn't work, the page refreshes which clears all fields which may also impact this? im unsure if that is the case but include it anyway. after that, include all prompts from today's session in the prompts txt file
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+look through the project and tell me what is left to do please
+
+look through everything
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+can you just confirm for me that what you have listed is EVERYTHING that is left to do? i need you to be thorough, looking through scope
+
+yesterday, the other agent i used missed one thing, and when i called it out on that it found many other things. 
+
+for example, i realised that there was a security flaw as when you entered the incorrect password, it told you it was incorrect. it should just give a generic valdiation error that doesn't confirm whether there is an account (this is fixed now)
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+are the nice to haves actually part of the scope? i need you to stay faithful to the scope, INCREDIBLY faithful
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+when looking at the scope i need you to be looking at this@c:\Users\jack\Downloads\petflix-prd-2025-11-10 (1).md 
+
+go through it all and tell me what is left over from this
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+go ahead and do all of this, get back to me once its done and we will go through it all, and clean it up/fix anything
+
+once you're done, summarise everything you've done and again, ensure youre faithful to scope
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+ok so what are the next steps
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+before anything can we sort out the file organisation? it's a mess, we have petflix-main (1) into petflix-main, which then has /backend, /frontend, /petflix\node_modules, /petflix-1 and /petflix-frontend
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+can you do the reorganisation? i just deleted backend/ frontend/ and petflix/
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+can you run the terminal commands to tes tthe new structure for me
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+right ok so what do i do now?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+@powershell (1-9)
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+i already have an env file no? check that
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+am i fine to delete /petflix-main now?>
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+@node (1-19)  i got this when trying to run backend so what do i do?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+@node (37-57)
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+for the introduction when you open the app, can we get a previous button? tehres a forward and a skip button but no way to go back
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+it looks kind of weird with 3 buttons so cramped, what cna we do to fix this
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+looks a bit weird - can you make the box a fixed width and height so the buttons dont keep shifting?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+its a bit too tall, so maybe a little less tall?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+tiny bit smaller, and also make the skip button an actual button with similar stylisation to this
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+seeing as all the lines on every card are only two lines, you can just make it below those two lines?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+i meant the height, you can put the skip button back in the top right
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+can you add the previous button to the first card, just grayed out?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+right now on light mode and dark mode, the site looks weird like there is no clear separation (i.e color separation) between elements)
+
+can you add something to fix this?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+theres still not enough color separation 
+
+can you make this (first image) the navbar colour on dark mode
+
+and this (second image) the bg colour on dark mode?
+
+
+
+for light mode, freestyle it. follow the same principle
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+why is there a load of weird lines?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+can you make the header #191A1F and the background #121215
+
+for light mode do #F7F7F8 header and #FFFFFF background
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+looks better but again, what are these lines? are they an issue on my end?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+they are horizontal and appearing on the background
+
+they're only on this section, and they start off not very tall but get taller as they go down
+
+they dont move as i scroll
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+that works now
+
+i feel like this part of the main page is a bit boring though, maybe some image for the background would be good?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+that works but ill give you a different image, what dimensions does it need to be?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+what image do you suggest
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+if i send you an image can you remove the watermark
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+her
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+pasted it in now what
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+is it stated in the scope that users can access the dashboard without being signed up? i expected it to make you sign up before anything, redirecting you to the login page if you try to access anywhere else
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+if the docs mention the landing page as guest accessible i want that but ONLY if the by the docs, you mean this@c:\Users\jack\Downloads\petflix-prd-2025-11-10 (1).md 
+
+this should be your number 1 source of information
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+on the topic of the prd, what from that is remaining to do?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+start with the high priority, get back to me when its done and then give me a summary of what you did. then just tell me hwo to test it all
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+how do i do step 1?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+im getting this error when i try to upload a video
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+i get thsi now
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+does my youtube api key have to be in frontend or backend .env
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+okay, when we were setting up stuff you didnt mention the youtube api key.
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+im on my project but i dont know how to get the api key
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+does the prd state that a video cant be shared twice on petflix?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+when i uploaded my video it did this
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+ignore that previous message it had old logs, this is what happens when i click on a video
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+@node (26-56) 
+
+this happens when i run npm dev
+
+also, the issue still isnt fixed. the migrations have been run too, by the way. i've attached a screenshot of the logs
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+@node (27-64)
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+@node (72-92)  screenshot is from the browser console, i've also attached the backend console logs
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+@node (12-54)
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+it actually works now, where were we?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+match the prd, then we move on to whats next
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+can you show me where in the prd it says this first?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+oky what do i do to finish this? what migration do i run?
+
+
+=== cursor_review_project_tasks_and_next_st (2).md ===
+i ran the migration, can you put everything that needs to be done in a document titled 'to do - wed' so i can continue tomorro
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+look through the project and tell me what is left to do please
+
+look through everything
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+can you just confirm for me that what you have listed is EVERYTHING that is left to do? i need you to be thorough, looking through scope
+
+yesterday, the other agent i used missed one thing, and when i called it out on that it found many other things. 
+
+for example, i realised that there was a security flaw as when you entered the incorrect password, it told you it was incorrect. it should just give a generic valdiation error that doesn't confirm whether there is an account (this is fixed now)
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+are the nice to haves actually part of the scope? i need you to stay faithful to the scope, INCREDIBLY faithful
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+when looking at the scope i need you to be looking at this@c:\Users\jack\Downloads\petflix-prd-2025-11-10 (1).md 
+
+go through it all and tell me what is left over from this
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+go ahead and do all of this, get back to me once its done and we will go through it all, and clean it up/fix anything
+
+once you're done, summarise everything you've done and again, ensure youre faithful to scope
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+ok so what are the next steps
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+before anything can we sort out the file organisation? it's a mess, we have petflix-main (1) into petflix-main, which then has /backend, /frontend, /petflix\node_modules, /petflix-1 and /petflix-frontend
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+can you do the reorganisation? i just deleted backend/ frontend/ and petflix/
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+can you run the terminal commands to tes tthe new structure for me
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+right ok so what do i do now?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+@powershell (1-9)
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+i already have an env file no? check that
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+am i fine to delete /petflix-main now?>
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+@node (1-19)  i got this when trying to run backend so what do i do?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+@node (37-57)
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+for the introduction when you open the app, can we get a previous button? tehres a forward and a skip button but no way to go back
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+it looks kind of weird with 3 buttons so cramped, what cna we do to fix this
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+looks a bit weird - can you make the box a fixed width and height so the buttons dont keep shifting?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+its a bit too tall, so maybe a little less tall?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+tiny bit smaller, and also make the skip button an actual button with similar stylisation to this
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+seeing as all the lines on every card are only two lines, you can just make it below those two lines?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+i meant the height, you can put the skip button back in the top right
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+can you add the previous button to the first card, just grayed out?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+right now on light mode and dark mode, the site looks weird like there is no clear separation (i.e color separation) between elements)
+
+can you add something to fix this?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+theres still not enough color separation 
+
+can you make this (first image) the navbar colour on dark mode
+
+and this (second image) the bg colour on dark mode?
+
+
+
+for light mode, freestyle it. follow the same principle
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+why is there a load of weird lines?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+can you make the header #191A1F and the background #121215
+
+for light mode do #F7F7F8 header and #FFFFFF background
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+looks better but again, what are these lines? are they an issue on my end?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+they are horizontal and appearing on the background
+
+they're only on this section, and they start off not very tall but get taller as they go down
+
+they dont move as i scroll
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+that works now
+
+i feel like this part of the main page is a bit boring though, maybe some image for the background would be good?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+that works but ill give you a different image, what dimensions does it need to be?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+what image do you suggest
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+if i send you an image can you remove the watermark
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+her
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+pasted it in now what
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+is it stated in the scope that users can access the dashboard without being signed up? i expected it to make you sign up before anything, redirecting you to the login page if you try to access anywhere else
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+if the docs mention the landing page as guest accessible i want that but ONLY if the by the docs, you mean this@c:\Users\jack\Downloads\petflix-prd-2025-11-10 (1).md 
+
+this should be your number 1 source of information
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+on the topic of the prd, what from that is remaining to do?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+start with the high priority, get back to me when its done and then give me a summary of what you did. then just tell me hwo to test it all
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+how do i do step 1?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+im getting this error when i try to upload a video
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+i get thsi now
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+does my youtube api key have to be in frontend or backend .env
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+okay, when we were setting up stuff you didnt mention the youtube api key.
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+im on my project but i dont know how to get the api key
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+does the prd state that a video cant be shared twice on petflix?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+when i uploaded my video it did this
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+ignore that previous message it had old logs, this is what happens when i click on a video
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+@node (26-56) 
+
+this happens when i run npm dev
+
+also, the issue still isnt fixed. the migrations have been run too, by the way. i've attached a screenshot of the logs
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+@node (27-64)
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+@node (72-92)  screenshot is from the browser console, i've also attached the backend console logs
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+@node (12-54)
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+it actually works now, where were we?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+match the prd, then we move on to whats next
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+can you show me where in the prd it says this first?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+oky what do i do to finish this? what migration do i run?
+
+
+=== cursor_review_project_tasks_and_next_st.md ===
+i ran the migration, can you put everything that needs to be done in a document titled 'to do - wed' so i can continue tomorro
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+i've pushed this project to prod, with vercel. i am getting this error on login. whyy?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+the cors origin is in there, it has been see?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+can you run those for me? 
+
+https://petflix-frontend.vercel.app
+
+this is my cors origin
+
+how do i make sure its set for prod? i don't see why it wouldn't be
+
+this is what i see when i go to health
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+'Configuration Settings in the current Production deployment differ from your current Project Settings.'
+
+does this mean anything?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+heres the build logs from that push
+
+16:16:36.452 Running build in Washington, D.C., USA (East) – iad1
+
+
+
+16:16:36.453 Build machine configuration: 2 cores, 8 GB
+
+16:16:36.462 Cloning github.com/jackrobertspb/Petflix (Branch: main, Commit: 13db304)
+
+16:16:36.463 Skipping build cache, deployment was triggered without cache.
+
+16:16:36.788 Cloning completed: 324.000ms
+
+16:16:37.258 Running "vercel build"
+
+16:16:37.660 Vercel CLI 48.12.0
+
+16:16:38.389 Running "install" command: `npm install`...
+
+16:16:57.397 npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+
+16:16:57.519 npm warn deprecated are-we-there-yet@2.0.0: This package is no longer supported.
+
+16:16:57.531 npm warn deprecated gauge@3.0.2: This package is no longer supported.
+
+16:16:57.591 npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+
+16:16:57.696 npm warn deprecated npmlog@5.0.1: This package is no longer supported.
+
+16:16:57.750 npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+
+16:16:59.592 
+
+16:16:59.593 added 248 packages, and audited 249 packages in 21s
+
+16:16:59.593 
+
+16:16:59.593 28 packages are looking for funding
+
+16:16:59.593   run `npm fund` for details
+
+16:16:59.594 
+
+16:16:59.594 found 0 vulnerabilities
+
+16:16:59.771 
+
+16:16:59.772 > backend@1.0.0 build
+
+16:16:59.772 > tsc
+
+16:16:59.772 
+
+16:17:04.260 Using TypeScript 5.9.3 (local user-provided)
+
+16:17:14.706 Installing dependencies...
+
+16:17:15.711 
+
+16:17:15.712 added 2 packages in 862ms
+
+16:17:15.713 
+
+16:17:15.713 30 packages are looking for funding
+
+16:17:15.713   run `npm fund` for details
+
+16:17:15.725 Running "npm run vercel-build"
+
+16:17:15.841 
+
+16:17:15.841 > backend@1.0.0 vercel-build
+
+16:17:15.842 > npm run build
+
+16:17:15.842 
+
+16:17:15.958 
+
+16:17:15.959 > backend@1.0.0 build
+
+16:17:15.959 > tsc
+
+16:17:15.959 
+
+16:17:23.261 Build Completed in /vercel/output [45s]
+
+16:17:23.682 Deploying outputs...
+
+16:17:27.497 Warning: Provided `memory` setting in `vercel.json` is ignored on Active CPU billing. You can safely remove this setting from your configuration. Learn more: https://vercel.com/docs/fluid-compute/pricing
+
+16:17:36.140 Deployment completed
+
+16:17:36.773 Creating build cache...
+
+16:17:40.295 Created build cache: 3.517s
+
+16:17:40.296 Uploading build cache [28.49 MB]
+
+16:17:40.724 Build cache uploaded: 433.14ms
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+it is set to backend.
+
+
+
+https://petflix-backend.vercel.app/  when i visit my backend url here, i get this 404 error
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+still getting these errors.
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+still getting these
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+push for me
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+is this project actually built for deployment fully? can you check that for me?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+my frontend has no environment variables, is that the issue?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+it was there i just didnt see it
+
+i changed it to 'petflix-backend.vercel.app' is this right? no https://?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+are these all the environment variables i need for the backend?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+https://petflix-frontend.vercel.app  and is this the correct data for the cors? the domain of y site is https://petflix-frontend.vercel.app/
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+so why isnt it working?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+still getting this error after hard refreshing. dont do anyhtging yet, im going to look at the other stuff. just rpely wiht ok
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+is cors origin even right?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+the issue was the frontend url on the backend env, it was wrong and still localhost
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+what are these errors? i know the bottom ones are from youtube thumbnails or something
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+do you retain information from chat to chat?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+in another chat, the agent messed up the entire site. there is no dashboard and the home page looks like this now what do i do
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+i've put everything back from the last save, push for me
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+just give me the command
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+now whwenever i attempt login i get these issues
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+it was already https://petflix-backend.vercel.app/api/v1 , what do i do?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+still getting this says its a cors error
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+last time this was an issue, it was an issue with env variables being misconfigured and the old vite_api_url or something pointing to localhost instead of petflix
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+login:1 Access to XMLHttpRequest at 'https://petflix-backend.vercel.app/api/v1/auth/login' from origin 'https://petflix-frontend.vercel.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: The 'Access-Control-Allow-Origin' header has a value 'https://petflix-frontend.vercel.app/' that is not equal to the supplied origin.
+
+
+
+what does htis mean
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+why would that be the issue
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+it works, finally. now i have an issue with the delete video/comment button, they dont work. when i click, nothing comes up. add something to log what the issue could be
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+i ahve pushed this to prod usinjg the command you gave me, thats fine right?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+i get this error uploading a profile picture
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+and when i press save changes after changing my bio, nothing happens
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+i get this on my console when i upload picture
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+i have a bucket already
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+my backend had some errors building, could that be the issue?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+nobody said to do anything
+
+
+
+these are my build logs
+
+15:12:07.089 Running build in Washington, D.C., USA (East) – iad1
+
+15:12:07.090 Build machine configuration: 2 cores, 8 GB
+
+15:12:07.262 Cloning github.com/jackrobertspb/Petflix (Branch: main, Commit: 422adda)
+
+15:12:07.921 Cloning completed: 659.000ms
+
+15:12:08.108 Restored build cache from previous deployment (8wWQPbgvExiZ7T5KdMWoFvxES3iZ)
+
+15:12:08.479 Running "vercel build"
+
+15:12:08.919 Vercel CLI 48.12.0
+
+15:12:09.612 Running "install" command: `npm install`...
+
+15:12:14.912 
+
+15:12:14.913 up to date, audited 255 packages in 5s
+
+15:12:14.913 
+
+15:12:14.914 31 packages are looking for funding
+
+15:12:14.914   run `npm fund` for details
+
+15:12:14.916 
+
+15:12:14.916 found 0 vulnerabilities
+
+15:12:15.061 
+
+15:12:15.061 > backend@1.0.0 build
+
+15:12:15.061 > tsc
+
+15:12:15.062 
+
+15:12:19.381 src/routes/users.ts(173,33): error TS2339: Property 'statusCode' does not exist on type 'StorageError'.
+
+15:12:19.382 src/routes/users.ts(174,28): error TS2339: Property 'error' does not exist on type 'StorageError'.
+
+15:12:19.382 src/server.ts(108,5): error TS2322: Type 'string' is not assignable to type 'boolean | string[] | ((origin: string | undefined, callback: (err: Error | null, allow?: boolean | undefined) => void) => void)'.
+
+15:12:19.409 Error: Command "npm run build" exited with 2
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+@powershell (323-338)
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+i did that command you sent and then repushed and it says its up to date already
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+@powershell (350-373)
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+its still not working
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+after a video gets deleted it sitll shows in recent, hide it from there
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+what command do i use to push again
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+when i change my pfp from one thing aolready set to another, it says the upload was succesful but remains as the old one
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+its still not changing
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+@powershell (409-422) 
+
+is this all good
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+is the recent section meant to be recently watched or recently uploaded
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+in the prd, is it recently viewed or uploaded
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+is that not meant to only show it offline?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+how do you suggest we clean this up? dont do anything yet, just need to clean it. also the emojis arent needed
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+go ahead with the 4th, can we get the users profile picture in the top right to the left of sign out as a wayt to access profile?
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+dorp down isnt visible
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+now its like this
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+you can remove the sign out button and put that as part of the drop down, make it red obviously
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+the width of the drop dwon is confined to the same area as the proifile picture, fix that
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+can you give me a command to wipe the entire db to get it ready for a completely fresh test, then a command to add some dummy users, who have dummy videos with comments on them please
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+does the deleting everything include users
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+ok what do i run in sql to seed it
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+want to run it in my supabase sql editor
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+Error: Failed to run sql query: ERROR: P0003: query returned more than one row HINT: Make sure the query returns a single row, or use LIMIT 1. CONTEXT: PL/pgSQL function inline_code_block line 99 at SQL statement
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+Error: Failed to run sql query: ERROR: 42703: column "content" of relation "comments" does not exist QUERY: INSERT INTO comments (video_id, user_id, content, created_at, updated_at) VALUES (video_id, diana_id, (ARRAY[ 'This is perfect!', 'My heart is melting! ❤️', 'This is the best video!', 'I''m obsessed with this!', 'This is everything! ✨' ])[1 + floor(random() * 5)::int], NOW(), NOW()) CONTEXT: PL/pgSQL function inline_code_block line 190 at SQL statement
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+Error: Failed to run sql query: ERROR: 42702: column reference "video_id" is ambiguous DETAIL: It could refer to either a PL/pgSQL variable or a table column. QUERY: SELECT COUNT(*) FROM comments WHERE video_id IN (SELECT id FROM videos WHERE user_id IN (alice_id, bob_id, charlie_id, diana_id, ed_id)) CONTEXT: PL/pgSQL function inline_code_block line 205 at SQL statement
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+ok this isnt working what was the other thing you gave me? ill do that instead
+
+
+=== cursor_troubleshooting_login_error_on_v.md ===
+just forget it, clean up the project and remove unnecessary files
+
