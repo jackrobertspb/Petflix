@@ -159,6 +159,19 @@ router.post('/:userId/profile-picture', authenticateToken, validateUserId, async
 
     // Upload to Supabase Storage
     console.log('☁️ Uploading to Supabase Storage bucket: profile-pictures');
+    
+    // First, verify bucket is accessible
+    const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+    if (listError) {
+      console.error('❌ Failed to list buckets:', listError);
+    } else {
+      const bucketExists = buckets?.some(b => b.name === 'profile-pictures');
+      console.log('🔍 Bucket exists check:', bucketExists ? '✅ Found' : '❌ Not found');
+      if (!bucketExists) {
+        console.error('❌ Bucket "profile-pictures" not found. Available buckets:', buckets?.map(b => b.name));
+      }
+    }
+    
     const { data: _uploadData, error: uploadError } = await supabase.storage
       .from('profile-pictures')
       .upload(fileName, buffer, {
@@ -170,13 +183,23 @@ router.post('/:userId/profile-picture', authenticateToken, validateUserId, async
       console.error('❌ Supabase storage upload error:', uploadError);
       console.error('❌ Upload error details:', {
         message: uploadError.message,
-        statusCode: uploadError.statusCode,
-        error: uploadError.error
+        name: uploadError.name
       });
+      
+      // Provide more helpful error messages
+      let userMessage = uploadError.message || 'Failed to upload profile picture to storage';
+      if (uploadError.message?.includes('Bucket not found') || uploadError.message?.includes('not found')) {
+        userMessage = 'Storage bucket not found. Please contact support.';
+      } else if (uploadError.message?.includes('permission') || uploadError.message?.includes('access')) {
+        userMessage = 'Permission denied. Please check storage bucket permissions.';
+      } else if (uploadError.message?.includes('policy') || uploadError.message?.includes('RLS')) {
+        userMessage = 'Storage policy error. Please check bucket policies.';
+      }
+      
       res.status(500).json({ 
         error: 'Upload failed',
-        message: uploadError.message || 'Failed to upload profile picture to storage',
-        details: uploadError
+        message: userMessage,
+        details: process.env.NODE_ENV === 'development' ? uploadError : undefined
       });
       return;
     }

@@ -102,10 +102,11 @@ try {
     allowedOrigins = true; // Allow all origins
   } else if (corsOrigin.includes(',')) {
     // Multiple origins (comma-separated) - normalize each
-    allowedOrigins = corsOrigin.split(',').map(origin => normalizeOrigin(origin)).filter(Boolean);
+    allowedOrigins = corsOrigin.split(',').map(origin => normalizeOrigin(origin)).filter(Boolean) as string[];
   } else {
-    // Single origin - normalize it
-    allowedOrigins = normalizeOrigin(corsOrigin);
+    // Single origin - normalize it and wrap in array
+    const normalized = normalizeOrigin(corsOrigin);
+    allowedOrigins = normalized ? [normalized] : [];
   }
   
   // Use a function for origin checking to handle trailing slashes, case-insensitive matching, and Vercel preview URLs

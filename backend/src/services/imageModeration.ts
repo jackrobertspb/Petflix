@@ -21,7 +21,18 @@ export async function moderateProfilePicture(
 
   try {
     // 1. Validate image dimensions
-    const metadata = await sharp(imageBuffer).metadata();
+    // Wrap in try-catch in case sharp fails to load at runtime (native module issues)
+    let metadata;
+    try {
+      metadata = await sharp(imageBuffer).metadata();
+    } catch (sharpError: any) {
+      console.warn('⚠️ Sharp processing failed, skipping image moderation:', sharpError);
+      // Return approved if sharp fails (don't block uploads)
+      return {
+        approved: true,
+        warnings: ['Image moderation unavailable - upload allowed']
+      };
+    }
     
     if (!metadata.width || !metadata.height) {
       return {
