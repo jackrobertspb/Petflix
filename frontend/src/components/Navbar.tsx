@@ -60,7 +60,7 @@ export const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center gap-4 xl:gap-6">
+          <div className="hidden lg:flex items-center gap-4 xl:gap-6 overflow-visible">
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
@@ -144,15 +144,20 @@ export const Navbar = () => {
                       >
                         Settings
                       </Link>
+                      <div className="border-t border-gray-200 dark:border-gray-700">
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            handleLogout();
+                          }}
+                          className="w-full text-left px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-petflix-gray transition font-medium"
+                        >
+                          Sign Out
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="px-3 xl:px-4 py-1.5 xl:py-2 bg-lightblue dark:bg-petflix-orange hover:opacity-90 text-charcoal dark:text-white font-bold rounded transition text-sm xl:text-base"
-                >
-                  Sign Out
-                </button>
               </>
             ) : (
               <>
