@@ -299,19 +299,21 @@ router.patch(
       const { bio, profile_picture_url } = req.body;
       console.log('📝 Update fields - bio:', bio, 'profile_picture_url:', profile_picture_url);
 
-      // Build update object with only provided fields
+      // Build update object with only provided, non-empty fields
       const updates: { 
         bio?: string; 
         profile_picture_url?: string;
       } = {};
 
-      if (bio !== undefined) {
-        updates.bio = bio;
-        console.log('✅ Adding bio to updates:', bio);
+      // Only add bio if it's defined and not an empty string (allow empty string to clear bio)
+      if (bio !== undefined && bio !== null) {
+        updates.bio = bio.trim(); // Trim whitespace, empty string is valid to clear bio
+        console.log('✅ Adding bio to updates:', updates.bio);
       }
 
-      if (profile_picture_url !== undefined) {
-        updates.profile_picture_url = profile_picture_url;
+      // Only add profile_picture_url if it's defined, not null, and not empty string
+      if (profile_picture_url !== undefined && profile_picture_url !== null && profile_picture_url !== '') {
+        updates.profile_picture_url = profile_picture_url.trim();
         console.log('✅ Adding profile_picture_url to updates');
       }
 

@@ -114,6 +114,23 @@ export async function getRecentlyViewed(): Promise<RecentlyViewedVideo[]> {
   }
 }
 
+// Remove a specific video from recently viewed
+export async function removeRecentlyViewed(videoId: string): Promise<void> {
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    await new Promise<void>((resolve, reject) => {
+      const deleteRequest = store.delete(videoId);
+      deleteRequest.onsuccess = () => resolve();
+      deleteRequest.onerror = () => reject(deleteRequest.error);
+    });
+  } catch (error) {
+    console.error('Failed to remove recently viewed video:', error);
+    // Don't throw - offline storage is optional
+  }
+}
+
 // Clear all recently viewed videos
 export async function clearRecentlyViewed(): Promise<void> {
   try {

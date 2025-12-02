@@ -4,7 +4,7 @@ import { api, videoLikesAPI, commentLikesAPI, commentsAPI } from '../services/ap
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { formatRelativeTime } from '../lib/dateUtils';
-import { trackRecentlyViewed } from '../lib/indexedDB';
+import { trackRecentlyViewed, removeRecentlyViewed } from '../lib/indexedDB';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -608,6 +608,16 @@ export const VideoDetail = () => {
       console.log('📡 Sending delete request for video:', id);
       await api.delete(`/videos/${id}`);
       console.log('✅ Video deleted successfully');
+      
+      // Remove from IndexedDB if it exists there
+      try {
+        await removeRecentlyViewed(id);
+        console.log('✅ Video removed from recently viewed');
+      } catch (indexedDBError) {
+        // Don't fail if IndexedDB removal fails - it's optional
+        console.warn('⚠️ Failed to remove from IndexedDB:', indexedDBError);
+      }
+      
       toast.success('Video deleted successfully');
       setShowDeleteVideoModal(false);
       // Redirect to profile after a brief delay

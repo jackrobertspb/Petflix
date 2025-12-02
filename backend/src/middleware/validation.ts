@@ -42,7 +42,7 @@ export const validateLogin: ValidationChain[] = [
 // Profile update validation
 export const validateProfileUpdate: ValidationChain[] = [
   body('bio')
-    .optional()
+    .optional({ nullable: true, checkFalsy: true })
     .trim()
     .isLength({ max: 255 })
     .withMessage('Bio must not exceed 255 characters')
@@ -52,12 +52,23 @@ export const validateProfileUpdate: ValidationChain[] = [
     }),
   
   body('profile_picture_url')
-    .optional()
+    .optional({ nullable: true, checkFalsy: true })
+    .custom((value) => {
+      // If value is null, undefined, or empty string, it's valid (allows clearing the URL)
+      if (!value || value === null || value === '') {
+        return true;
+      }
+      // If value is provided, validate it's a URL
+      const urlPattern = /^https?:\/\/.+/;
+      if (!urlPattern.test(value)) {
+        throw new Error('Profile picture URL must be a valid HTTP/HTTPS URL');
+      }
+      if (value.length > 500) {
+        throw new Error('Profile picture URL must not exceed 500 characters');
+      }
+      return true;
+    })
     .trim()
-    .isURL({ protocols: ['http', 'https'], require_protocol: true })
-    .withMessage('Profile picture URL must be a valid HTTP/HTTPS URL')
-    .isLength({ max: 500 })
-    .withMessage('Profile picture URL must not exceed 500 characters')
 ];
 
 // Email update validation

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getRecentlyViewed, isIndexedDBSupported } from '../lib/indexedDB';
+import { getRecentlyViewed, isIndexedDBSupported, removeRecentlyViewed } from '../lib/indexedDB';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
 import { VideoCardSkeleton } from '../components/LoadingSkeleton';
 import { EmptyState } from '../components/EmptyState';
 import { formatRelativeTime } from '../lib/dateUtils';
 import { Card, CardContent } from '@/components/ui/card';
+import { videosAPI } from '../services/api';
 
 interface RecentlyViewedVideo {
   videoId: string;
@@ -53,7 +54,43 @@ export const RecentlyViewed = () => {
     setLoading(true);
     try {
       const recentlyViewed = await getRecentlyViewed();
-      setVideos(recentlyViewed);
+      
+      // If online, verify videos still exist and remove deleted ones
+      if (!isOffline && recentlyViewed.length > 0) {
+        const validVideos: RecentlyViewedVideo[] = [];
+        const deletedVideoIds: string[] = [];
+        
+        // Check each video in parallel
+        await Promise.all(
+          recentlyViewed.map(async (video) => {
+            try {
+              // Try to fetch the video - if it returns 404, it's deleted
+              await videosAPI.getVideo(video.videoId);
+              validVideos.push(video);
+            } catch (error: any) {
+              // If 404, video is deleted
+              if (error.response?.status === 404) {
+                deletedVideoIds.push(video.videoId);
+              } else {
+                // For other errors (network, etc.), keep the video (might be temporary)
+                validVideos.push(video);
+              }
+            }
+          })
+        );
+        
+        // Remove deleted videos from IndexedDB
+        if (deletedVideoIds.length > 0) {
+          await Promise.all(
+            deletedVideoIds.map(videoId => removeRecentlyViewed(videoId))
+          );
+        }
+        
+        setVideos(validVideos);
+      } else {
+        // Offline mode - show all videos from IndexedDB
+        setVideos(recentlyViewed);
+      }
     } catch (error) {
       console.error('Failed to load recently viewed videos:', error);
     } finally {
