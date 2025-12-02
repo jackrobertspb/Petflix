@@ -26,10 +26,25 @@ export const Feed = () => {
 
   const fetchVideos = async () => {
     try {
-      const response = await api.get('/videos');
-      setVideos(response.data.videos || []);
-    } catch (error) {
+      // Try /api/v1/videos first (if baseURL doesn't include /api/v1)
+      // Otherwise try /videos if baseURL already includes /api/v1
+      const response = await api.get('/api/v1/videos').catch(() => 
+        api.get('/videos')
+      );
+      
+      // Handle different response structures
+      const videos = response.data?.videos || response.data || [];
+      setVideos(Array.isArray(videos) ? videos : []);
+    } catch (error: any) {
       console.error('Failed to fetch videos:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        baseURL: api.defaults.baseURL
+      });
+      // Set empty array on error so we show the "no videos" message
+      setVideos([]);
     } finally {
       setLoading(false);
     }
