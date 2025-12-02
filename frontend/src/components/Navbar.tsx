@@ -51,8 +51,8 @@ export const Navbar = () => {
 
   return (
     <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-navbar-light dark:bg-petflix-navbar-dark border-b border-gray-200 dark:border-gray-800 shadow-lg">
-      <div className="px-4 sm:px-6 md:px-8 py-3 md:py-4 max-w-full">
-        <div className="flex items-center justify-between w-full">
+      <div className="px-4 sm:px-6 md:px-8 py-3 md:py-4 max-w-full overflow-visible">
+        <div className="flex items-center justify-between w-full overflow-visible">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-1 sm:gap-2 text-lightblue dark:text-petflix-orange hover:opacity-80 transition flex-shrink-0" onClick={() => setMobileMenuOpen(false)}>
             <span className="text-2xl sm:text-3xl">🐾</span>
@@ -93,7 +93,7 @@ export const Navbar = () => {
                 </Link>
                 
                 {/* User Profile Menu */}
-                <div className="relative" ref={userMenuRef}>
+                <div className="relative" ref={userMenuRef} style={{ minWidth: 'fit-content' }}>
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 dark:border-gray-600 hover:border-lightblue dark:hover:border-petflix-orange transition"
@@ -113,7 +113,7 @@ export const Navbar = () => {
                   </button>
 
                   {userMenuOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-petflix-dark-gray border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[100] overflow-hidden">
+                    <div className="absolute right-0 top-full mt-2 w-48 min-w-[12rem] bg-white dark:bg-petflix-dark-gray border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[100] overflow-visible">
                       <Link
                         to={`/profile/${user.id}`}
                         onClick={() => setUserMenuOpen(false)}
