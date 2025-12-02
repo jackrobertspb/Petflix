@@ -210,14 +210,14 @@ router.post('/:userId/profile-picture', authenticateToken, validateUserId, async
       .from('profile-pictures')
       .getPublicUrl(fileName);
 
-    const publicUrl = urlData.publicUrl;
-    console.log('🔗 Public URL:', publicUrl);
+    const baseUrl = urlData.publicUrl;
+    console.log('🔗 Base Public URL:', baseUrl);
 
-    // Update user profile with new picture URL
+    // Update user profile with new picture URL (store base URL without timestamp)
     console.log('💾 Updating user profile in database...');
     const { data: updatedUser, error: updateError } = await supabase
       .from('users')
-      .update({ profile_picture_url: publicUrl })
+      .update({ profile_picture_url: baseUrl })
       .eq('id', userId)
       .select('id, username, email, profile_picture_url, bio, created_at, updated_at')
       .single();
@@ -239,10 +239,16 @@ router.post('/:userId/profile-picture', authenticateToken, validateUserId, async
     }
     console.log('✅ Profile updated successfully');
 
+    // Return URL with cache-busting timestamp for immediate refresh
+    const urlWithCacheBust = `${baseUrl}?t=${Date.now()}`;
+    
     res.status(200).json({
       message: 'Profile picture uploaded successfully',
-      profile_picture_url: publicUrl,
-      user: updatedUser
+      profile_picture_url: urlWithCacheBust, // Return with timestamp for immediate refresh
+      user: {
+        ...updatedUser,
+        profile_picture_url: urlWithCacheBust // Also include in user object
+      }
     });
   } catch (error: any) {
     console.error('❌ Profile picture upload error (catch block):', error);
