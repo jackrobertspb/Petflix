@@ -50,7 +50,7 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-navbar-light dark:bg-petflix-navbar-dark border-b border-gray-200 dark:border-gray-800 shadow-lg overflow-x-hidden">
+    <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-navbar-light dark:bg-petflix-navbar-dark border-b border-gray-200 dark:border-gray-800 shadow-lg">
       <div className="px-4 sm:px-6 md:px-8 py-3 md:py-4 max-w-full">
         <div className="flex items-center justify-between w-full">
           {/* Logo */}
@@ -113,7 +113,7 @@ export const Navbar = () => {
                   </button>
 
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-petflix-dark-gray border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 overflow-hidden">
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-petflix-dark-gray border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[100] overflow-hidden">
                       <Link
                         to={`/profile/${user.id}`}
                         onClick={() => setUserMenuOpen(false)}
