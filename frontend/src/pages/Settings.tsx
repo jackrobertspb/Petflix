@@ -26,6 +26,7 @@ export const Settings = () => {
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [profilePicturePreview, setProfilePicturePreview] = useState<string | null>(null);
   const [uploadingPicture, setUploadingPicture] = useState(false);
+  const [profilePictureVersion, setProfilePictureVersion] = useState(0); // Force image reload
   const [email, setEmail] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingEmail, setSavingEmail] = useState(false);
@@ -75,7 +76,10 @@ export const Settings = () => {
       const response = await api.get(`/users/${user.id}`);
       const userData = response.data.user;
       setBio(userData.bio || '');
-      setProfilePictureUrl(userData.profile_picture_url || '');
+      // Add cache-busting timestamp to profile picture URL when loading from database
+      const baseUrl = userData.profile_picture_url || '';
+      const urlWithCacheBust = baseUrl ? `${baseUrl.split('?')[0]}?t=${Date.now()}` : '';
+      setProfilePictureUrl(urlWithCacheBust);
       setEmail(userData.email || '');
     } catch (error) {
       console.error('Failed to load user data:', error);
@@ -135,22 +139,31 @@ export const Settings = () => {
         imageType: profilePictureFile.type,
       });
 
-      // Update local state with new URL
+      // Update local state with new URL (backend already includes cache-busting timestamp)
       const newUrl = response.data.profile_picture_url;
-      setProfilePictureUrl(newUrl);
+      
+      // Clear preview and file first
       setProfilePictureFile(null);
       setProfilePicturePreview(null);
+      
+      // Increment version to force image reload
+      setProfilePictureVersion(prev => prev + 1);
+      
+      // Update URL with fresh cache-busting parameter
+      const baseUrl = newUrl.split('?')[0];
+      const urlWithFreshTimestamp = `${baseUrl}?t=${Date.now()}`;
+      setProfilePictureUrl(urlWithFreshTimestamp);
       
       // Update auth context with new profile picture
       if (user && updateUser) {
         updateUser({
           ...user,
-          profile_picture_url: newUrl,
+          profile_picture_url: urlWithFreshTimestamp,
         });
       }
-
-      // Reload user data to ensure everything is in sync
-      await loadUserData();
+      
+      // Don't reload user data immediately - we already have the new URL
+      // The image will reload because of the version change and new timestamp
 
       toast.success('Profile picture uploaded successfully!');
     } catch (error: any) {
@@ -366,9 +379,19 @@ export const Settings = () => {
                 {(profilePicturePreview || profilePictureUrl) && (
                   <div className="relative inline-block">
                     <img
+                      key={`profile-pic-${profilePictureVersion}-${profilePictureUrl || profilePicturePreview || 'default'}`}
                       src={profilePicturePreview || profilePictureUrl || ''}
                       alt="Profile preview"
                       className="w-32 h-32 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
+                      onError={(e) => {
+                        // If image fails to load, try removing cache-busting and reloading
+                        const target = e.target as HTMLImageElement;
+                        const currentSrc = target.src;
+                        if (currentSrc.includes('?t=')) {
+                          const baseUrl = currentSrc.split('?')[0];
+                          target.src = `${baseUrl}?t=${Date.now()}`;
+                        }
+                      }}
                     />
                     {profilePicturePreview && (
                       <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded">
