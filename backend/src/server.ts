@@ -205,8 +205,9 @@ try {
   app.use(cors());
   logger.warn('⚠️ CORS fallback: allowing all origins due to configuration error');
 }
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Increase JSON body size limit to 10MB for base64 image uploads
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Apply global rate limiter to all API routes
 app.use('/api/', globalLimiter);
