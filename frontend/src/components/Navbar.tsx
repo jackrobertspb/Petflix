@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -9,6 +9,39 @@ export const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    if (userMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [userMenuOpen]);
 
   const handleLogout = () => {
     logout();
@@ -55,21 +88,65 @@ export const Navbar = () => {
                 <Link to="/feed" className="text-sm xl:text-base text-charcoal dark:text-white hover:text-lightblue dark:hover:text-gray-300 transition font-medium">
                   My Feed
                 </Link>
-                <Link to="/recently-viewed" className="text-sm xl:text-base text-charcoal dark:text-white hover:text-lightblue dark:hover:text-gray-300 transition font-medium">
-                  📺 Recent
-                </Link>
-                <Link to="/playlists" className="text-sm xl:text-base text-charcoal dark:text-white hover:text-lightblue dark:hover:text-gray-300 transition font-medium">
-                  📂 Playlists
-                </Link>
                 <Link to="/share" className="text-sm xl:text-base text-lightblue dark:text-petflix-orange hover:opacity-80 transition font-medium">
-                  + Share
+                  Share
                 </Link>
-                <Link to={`/profile/${user.id}`} className="text-sm xl:text-base text-charcoal dark:text-white hover:text-lightblue dark:hover:text-gray-300 transition font-medium">
-                  Profile
-                </Link>
-                <Link to="/settings" className="text-sm xl:text-base text-charcoal dark:text-white hover:text-lightblue dark:hover:text-gray-300 transition font-medium">
-                  ⚙️ Settings
-                </Link>
+                
+                {/* User Profile Menu */}
+                <div className="relative" ref={userMenuRef}>
+                  <button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 dark:border-gray-600 hover:border-lightblue dark:hover:border-petflix-orange transition"
+                    aria-label="User menu"
+                  >
+                    {user.profile_picture_url ? (
+                      <img
+                        src={user.profile_picture_url}
+                        alt={user.username || 'Profile'}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-lightblue dark:bg-petflix-orange flex items-center justify-center text-white font-bold text-lg">
+                        {user.username?.[0]?.toUpperCase() || 'U'}
+                      </div>
+                    )}
+                  </button>
+
+                  {userMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-petflix-dark-gray border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 overflow-hidden">
+                      <Link
+                        to={`/profile/${user.id}`}
+                        onClick={() => setUserMenuOpen(false)}
+                        className="block px-4 py-3 text-sm text-charcoal dark:text-white hover:bg-gray-100 dark:hover:bg-petflix-gray transition"
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        to="/playlists"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="block px-4 py-3 text-sm text-charcoal dark:text-white hover:bg-gray-100 dark:hover:bg-petflix-gray transition"
+                      >
+                        Playlists
+                      </Link>
+                      {isOffline && (
+                        <Link
+                          to="/recently-viewed"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="block px-4 py-3 text-sm text-charcoal dark:text-white hover:bg-gray-100 dark:hover:bg-petflix-gray transition"
+                        >
+                          Recently Viewed
+                        </Link>
+                      )}
+                      <Link
+                        to="/settings"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="block px-4 py-3 text-sm text-charcoal dark:text-white hover:bg-gray-100 dark:hover:bg-petflix-gray transition"
+                      >
+                        Settings
+                      </Link>
+                    </div>
+                  )}
+                </div>
                 <button
                   onClick={handleLogout}
                   className="px-3 xl:px-4 py-1.5 xl:py-2 bg-lightblue dark:bg-petflix-orange hover:opacity-90 text-charcoal dark:text-white font-bold rounded transition text-sm xl:text-base"
@@ -132,20 +209,22 @@ export const Navbar = () => {
                   <Link to="/feed" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 text-charcoal dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
                     My Feed
                   </Link>
-                  <Link to="/recently-viewed" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 text-charcoal dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
-                    📺 Recent
-                  </Link>
-                  <Link to="/playlists" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 text-charcoal dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
-                    📂 Playlists
-                  </Link>
                   <Link to="/share" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 text-lightblue dark:text-petflix-orange hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
-                    + Share
+                    Share
                   </Link>
                   <Link to={`/profile/${user.id}`} onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 text-charcoal dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
                     Profile
                   </Link>
+                  <Link to="/playlists" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 text-charcoal dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
+                    Playlists
+                  </Link>
+                  {isOffline && (
+                    <Link to="/recently-viewed" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 text-charcoal dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
+                      Recently Viewed
+                    </Link>
+                  )}
                   <Link to="/settings" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 text-charcoal dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
-                    ⚙️ Settings
+                    Settings
                   </Link>
                   <button
                     onClick={handleLogout}
