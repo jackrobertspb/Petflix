@@ -52,17 +52,21 @@ router.get('/:userId', validateUserId, async (req: Request, res: Response): Prom
 // POST /api/v1/users/:userId/profile-picture - Upload profile picture
 router.post('/:userId/profile-picture', authenticateToken, validateUserId, async (req: Request, res: Response): Promise<void> => {
   try {
+    console.log('📸 Profile picture upload request received');
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.error('❌ Validation failed:', errors.array());
       res.status(400).json({ error: 'Validation failed', details: errors.array() });
       return;
     }
 
     const { userId } = req.params;
     const authenticatedUserId = req.userId;
+    console.log('👤 User ID from params:', userId, 'Authenticated user:', authenticatedUserId);
 
     // Verify ownership
     if (userId !== authenticatedUserId) {
+      console.error('❌ Authorization failed: userId mismatch');
       res.status(403).json({ 
         error: 'Authorization failed',
         message: 'You can only update your own profile' 
@@ -72,6 +76,7 @@ router.post('/:userId/profile-picture', authenticateToken, validateUserId, async
 
     // Check if file was uploaded
     if (!req.body.image || !req.body.imageType) {
+      console.error('❌ Missing file data - image:', !!req.body.image, 'imageType:', !!req.body.imageType);
       res.status(400).json({ 
         error: 'Missing file',
         message: 'No image provided' 
@@ -81,10 +86,12 @@ router.post('/:userId/profile-picture', authenticateToken, validateUserId, async
 
     const imageData = req.body.image; // Base64 encoded image
     const imageType = req.body.imageType; // e.g., 'image/jpeg', 'image/png'
+    console.log('📷 Image type:', imageType, 'Image data length:', imageData?.length || 0);
     
     // Validate image type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(imageType)) {
+      console.error('❌ Invalid image type:', imageType);
       res.status(400).json({ 
         error: 'Invalid file type',
         message: 'Only JPEG, PNG, GIF, and WebP images are allowed' 
@@ -93,12 +100,25 @@ router.post('/:userId/profile-picture', authenticateToken, validateUserId, async
     }
 
     // Convert base64 to buffer
+    console.log('🔄 Converting base64 to buffer...');
     const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
-    const buffer = Buffer.from(base64Data, 'base64');
+    let buffer: Buffer;
+    try {
+      buffer = Buffer.from(base64Data, 'base64');
+      console.log('✅ Buffer created, size:', buffer.length, 'bytes');
+    } catch (bufferError: any) {
+      console.error('❌ Failed to create buffer:', bufferError);
+      res.status(400).json({ 
+        error: 'Invalid image data',
+        message: 'Failed to process image data' 
+      });
+      return;
+    }
 
     // Validate file size (max 5MB)
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (buffer.length > maxSize) {
+      console.error('❌ File too large:', buffer.length, 'bytes (max:', maxSize, ')');
       res.status(400).json({ 
         error: 'File too large',
         message: 'Profile picture must be less than 5MB' 
@@ -107,27 +127,38 @@ router.post('/:userId/profile-picture', authenticateToken, validateUserId, async
     }
 
     // Content moderation check
-    const { moderateProfilePicture } = await import('../services/imageModeration.js');
-    const moderationResult = await moderateProfilePicture(buffer, imageType);
-    
-    if (!moderationResult.approved) {
-      res.status(400).json({ 
-        error: 'Image moderation failed',
-        message: moderationResult.reason || 'Image did not pass moderation checks'
-      });
-      return;
-    }
+    console.log('🔍 Running image moderation...');
+    try {
+      const { moderateProfilePicture } = await import('../services/imageModeration.js');
+      const moderationResult = await moderateProfilePicture(buffer, imageType);
+      console.log('✅ Moderation result:', { approved: moderationResult.approved, reason: moderationResult.reason });
+      
+      if (!moderationResult.approved) {
+        console.error('❌ Image moderation failed:', moderationResult.reason);
+        res.status(400).json({ 
+          error: 'Image moderation failed',
+          message: moderationResult.reason || 'Image did not pass moderation checks'
+        });
+        return;
+      }
 
-    // Log warnings if any (but don't block upload)
-    if (moderationResult.warnings && moderationResult.warnings.length > 0) {
-      console.log(`Profile picture moderation warnings for user ${userId}:`, moderationResult.warnings);
+      // Log warnings if any (but don't block upload)
+      if (moderationResult.warnings && moderationResult.warnings.length > 0) {
+        console.log(`⚠️ Profile picture moderation warnings for user ${userId}:`, moderationResult.warnings);
+      }
+    } catch (moderationError: any) {
+      console.error('❌ Image moderation error:', moderationError);
+      // Don't fail upload if moderation service is down, but log it
+      console.warn('⚠️ Continuing without moderation due to error');
     }
 
     // Determine file extension
     const extension = imageType.split('/')[1] === 'jpeg' ? 'jpg' : imageType.split('/')[1];
     const fileName = `${userId}/profile-picture.${extension}`;
+    console.log('📁 File name:', fileName);
 
     // Upload to Supabase Storage
+    console.log('☁️ Uploading to Supabase Storage bucket: profile-pictures');
     const { data: _uploadData, error: uploadError } = await supabase.storage
       .from('profile-pictures')
       .upload(fileName, buffer, {
@@ -136,13 +167,20 @@ router.post('/:userId/profile-picture', authenticateToken, validateUserId, async
       });
 
     if (uploadError) {
-      console.error('Profile picture upload error:', uploadError);
+      console.error('❌ Supabase storage upload error:', uploadError);
+      console.error('❌ Upload error details:', {
+        message: uploadError.message,
+        statusCode: uploadError.statusCode,
+        error: uploadError.error
+      });
       res.status(500).json({ 
         error: 'Upload failed',
-        message: 'Failed to upload profile picture' 
+        message: uploadError.message || 'Failed to upload profile picture to storage',
+        details: uploadError
       });
       return;
     }
+    console.log('✅ File uploaded to Supabase Storage');
 
     // Get public URL
     const { data: urlData } = supabase.storage
@@ -150,8 +188,10 @@ router.post('/:userId/profile-picture', authenticateToken, validateUserId, async
       .getPublicUrl(fileName);
 
     const publicUrl = urlData.publicUrl;
+    console.log('🔗 Public URL:', publicUrl);
 
     // Update user profile with new picture URL
+    console.log('💾 Updating user profile in database...');
     const { data: updatedUser, error: updateError } = await supabase
       .from('users')
       .update({ profile_picture_url: publicUrl })
@@ -160,22 +200,40 @@ router.post('/:userId/profile-picture', authenticateToken, validateUserId, async
       .single();
 
     if (updateError || !updatedUser) {
-      console.error('Profile update error:', updateError);
+      console.error('❌ Profile update error:', updateError);
+      console.error('❌ Update error details:', {
+        message: updateError?.message,
+        code: updateError?.code,
+        details: updateError?.details,
+        hint: updateError?.hint
+      });
       res.status(500).json({ 
         error: 'Update failed',
-        message: 'Failed to update profile picture URL' 
+        message: updateError?.message || 'Failed to update profile picture URL',
+        details: updateError
       });
       return;
     }
+    console.log('✅ Profile updated successfully');
 
     res.status(200).json({
       message: 'Profile picture uploaded successfully',
       profile_picture_url: publicUrl,
       user: updatedUser
     });
-  } catch (error) {
-    console.error('Profile picture upload error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  } catch (error: any) {
+    console.error('❌ Profile picture upload error (catch block):', error);
+    console.error('❌ Error stack:', error.stack);
+    console.error('❌ Error details:', {
+      name: error.name,
+      message: error.message,
+      code: error.code
+    });
+    res.status(500).json({ 
+      error: 'Internal server error',
+      message: error.message || 'An unexpected error occurred',
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 
@@ -187,9 +245,13 @@ router.patch(
   validateProfileUpdate, 
   async (req: Request, res: Response): Promise<void> => {
     try {
+      console.log('💾 Profile update request received');
+      console.log('📦 Request body:', req.body);
+      
       // Check validation results
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.error('❌ Validation failed:', errors.array());
         res.status(400).json({ 
           error: 'Validation failed', 
           details: errors.array() 
@@ -199,9 +261,11 @@ router.patch(
 
       const { userId } = req.params;
       const authenticatedUserId = req.userId;
+      console.log('👤 User ID from params:', userId, 'Authenticated user:', authenticatedUserId);
 
       // Verify ownership
       if (userId !== authenticatedUserId) {
+        console.error('❌ Authorization failed: userId mismatch');
         res.status(403).json({ 
           error: 'Authorization failed',
           message: 'You can only update your own profile' 
@@ -210,6 +274,7 @@ router.patch(
       }
 
       const { bio, profile_picture_url } = req.body;
+      console.log('📝 Update fields - bio:', bio, 'profile_picture_url:', profile_picture_url);
 
       // Build update object with only provided fields
       const updates: { 
@@ -219,20 +284,25 @@ router.patch(
 
       if (bio !== undefined) {
         updates.bio = bio;
+        console.log('✅ Adding bio to updates:', bio);
       }
 
       if (profile_picture_url !== undefined) {
         updates.profile_picture_url = profile_picture_url;
+        console.log('✅ Adding profile_picture_url to updates');
       }
 
       // If no updates provided, return error
       if (Object.keys(updates).length === 0) {
+        console.error('❌ No valid fields provided for update');
         res.status(400).json({ 
           error: 'Update failed',
           message: 'No valid fields provided for update' 
         });
         return;
       }
+
+      console.log('💾 Updating database with:', updates);
 
       // Update database
       const { data: updatedUser, error: updateError } = await supabase
@@ -243,21 +313,39 @@ router.patch(
         .single();
 
       if (updateError || !updatedUser) {
-        console.error('Profile update error:', updateError);
+        console.error('❌ Profile update error:', updateError);
+        console.error('❌ Update error details:', {
+          message: updateError?.message,
+          code: updateError?.code,
+          details: updateError?.details,
+          hint: updateError?.hint
+        });
         res.status(500).json({ 
           error: 'Update failed',
-          message: 'Failed to update user profile' 
+          message: updateError?.message || 'Failed to update user profile',
+          details: updateError
         });
         return;
       }
 
+      console.log('✅ Profile updated successfully:', updatedUser);
       res.status(200).json({
         message: 'Profile updated successfully',
         user: updatedUser
       });
-    } catch (error) {
-      console.error('Profile update error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    } catch (error: any) {
+      console.error('❌ Profile update error (catch block):', error);
+      console.error('❌ Error stack:', error.stack);
+      console.error('❌ Error details:', {
+        name: error.name,
+        message: error.message,
+        code: error.code
+      });
+      res.status(500).json({ 
+        error: 'Internal server error',
+        message: error.message || 'An unexpected error occurred',
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
     }
   }
 );

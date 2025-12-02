@@ -162,20 +162,47 @@ export const Settings = () => {
   };
 
   const handleSaveProfile = async () => {
-    if (!user) return;
+    console.log('💾 Save profile clicked');
+    console.log('📊 Current state - user:', user?.id, 'bio:', bio, 'profilePictureUrl:', profilePictureUrl);
+    
+    if (!user) {
+      console.error('❌ No user found, cannot save profile');
+      return;
+    }
 
     setSavingProfile(true);
+    console.log('📡 Sending PATCH request to:', `/users/${user.id}`);
+    console.log('📦 Request body:', { bio, profile_picture_url: profilePictureUrl || null });
+    
     try {
-      await api.patch(`/users/${user.id}`, {
+      const response = await api.patch(`/users/${user.id}`, {
         bio,
         profile_picture_url: profilePictureUrl || null,
       });
+      console.log('✅ Profile update successful:', response.data);
       toast.success('Profile updated successfully!');
+      
+      // Update user in context if response includes user data
+      if (response.data?.user && updateUser) {
+        console.log('🔄 Updating user context with new data');
+        updateUser(response.data.user);
+      }
+      
+      // Reload user data to ensure sync
+      await loadUserData();
     } catch (error: any) {
-      console.error('Failed to update profile:', error);
+      console.error('❌ Failed to update profile:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        url: `/users/${user.id}`
+      });
       toast.error(error?.response?.data?.message || 'Failed to update profile');
     } finally {
       setSavingProfile(false);
+      console.log('🏁 Save profile finished');
     }
   };
 
