@@ -490,21 +490,37 @@ export const VideoDetail = () => {
   };
 
   const handleDeleteCommentClick = (commentId: string) => {
+    console.log('🗑️ Delete comment clicked:', commentId);
+    console.log('📊 Current state - showDeleteCommentModal:', showDeleteCommentModal);
+    console.log('📊 Current state - commentToDelete:', commentToDelete);
     setCommentToDelete(commentId);
     setShowDeleteCommentModal(true);
+    console.log('✅ After setState - showDeleteCommentModal should be true');
   };
 
   const handleConfirmDeleteComment = async () => {
-    if (!commentToDelete) return;
+    console.log('🗑️ Confirm delete comment called, commentToDelete:', commentToDelete);
+    if (!commentToDelete) {
+      console.error('❌ No commentToDelete set!');
+      return;
+    }
 
     try {
+      console.log('📡 Sending delete request for comment:', commentToDelete);
       await commentsAPI.deleteComment(commentToDelete);
+      console.log('✅ Comment deleted successfully');
       setComments(prev => prev.filter(c => c.id !== commentToDelete));
       toast.success('Comment deleted successfully');
       setShowDeleteCommentModal(false);
       setCommentToDelete(null);
     } catch (error: any) {
-      console.error('Failed to delete comment:', error);
+      console.error('❌ Failed to delete comment:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText
+      });
       toast.error('Failed to delete comment. Please try again.');
     }
   };
@@ -574,12 +590,24 @@ export const VideoDetail = () => {
   };
 
   const handleDeleteVideoClick = () => {
+    console.log('🗑️ Delete video clicked, video ID:', id);
+    console.log('📊 Current state - showDeleteVideoModal:', showDeleteVideoModal);
+    console.log('📊 Current user:', user);
     setShowDeleteVideoModal(true);
+    console.log('✅ After setState - showDeleteVideoModal should be true');
   };
 
   const handleConfirmDeleteVideo = async () => {
+    console.log('🗑️ Confirm delete video called, video ID:', id);
+    if (!id) {
+      console.error('❌ No video ID!');
+      return;
+    }
+
     try {
+      console.log('📡 Sending delete request for video:', id);
       await api.delete(`/videos/${id}`);
+      console.log('✅ Video deleted successfully');
       toast.success('Video deleted successfully');
       setShowDeleteVideoModal(false);
       // Redirect to profile after a brief delay
@@ -587,7 +615,14 @@ export const VideoDetail = () => {
         navigate(`/profile/${user?.id}`);
       }, 1500);
     } catch (error: any) {
-      console.error('Failed to delete video:', error);
+      console.error('❌ Failed to delete video:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        url: `/videos/${id}`
+      });
       toast.error('Failed to delete video. Please try again.');
     }
   };
@@ -1362,6 +1397,77 @@ export const VideoDetail = () => {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Video Modal */}
+      <Dialog open={showDeleteVideoModal} onOpenChange={setShowDeleteVideoModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-red-600 dark:text-red-400">🗑️ Delete Video</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-charcoal dark:text-white mb-4">
+              Are you sure you want to delete this video? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                onClick={() => {
+                  console.log('❌ Delete video cancelled');
+                  setShowDeleteVideoModal(false);
+                }}
+                variant="outline"
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleConfirmDeleteVideo}
+                variant="destructive"
+                className="flex-1 bg-red-600 hover:bg-red-700"
+              >
+                Delete Video
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Comment Modal */}
+      <Dialog open={showDeleteCommentModal} onOpenChange={setShowDeleteCommentModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-red-600 dark:text-red-400">🗑️ Delete Comment</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-charcoal dark:text-white mb-4">
+              Are you sure you want to delete this comment? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                onClick={() => {
+                  console.log('❌ Delete comment cancelled');
+                  setShowDeleteCommentModal(false);
+                  setCommentToDelete(null);
+                }}
+                variant="outline"
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleConfirmDeleteComment}
+                variant="destructive"
+                className="flex-1 bg-red-600 hover:bg-red-700"
+              >
+                Delete Comment
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
