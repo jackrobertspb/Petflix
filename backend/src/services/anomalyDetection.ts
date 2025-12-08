@@ -17,10 +17,10 @@ interface AnomalyConfig {
   webhookUrl?: string; // Webhook for external alerting
 }
 
-interface ErrorRate {
-  timestamp: Date;
-  errorCount: number;
-  warnCount: number;
+// interface ErrorRate {
+//   timestamp: Date;
+//   errorCount: number;
+//   warnCount: number;
   infoCount: number;
 }
 

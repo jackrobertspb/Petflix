@@ -3,8 +3,47 @@ import { param, validationResult } from 'express-validator';
 import { supabase } from '../config/supabase.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { queueNotification } from '../services/notificationGrouping.js';
+import { checkVideoAvailability } from '../services/youtube.js';
 
 const router = Router();
+
+/**
+ * Helper function to check and update video availability in the background
+ * Only checks videos that haven't been checked in the last 24 hours
+ */
+async function checkAndUpdateAvailability(videoId: string, youtubeVideoId: string, lastCheck: string | null) {
+  try {
+    // Skip if checked within last 24 hours
+    if (lastCheck) {
+      const lastCheckTime = new Date(lastCheck).getTime();
+      const now = Date.now();
+      const hoursSinceCheck = (now - lastCheckTime) / (1000 * 60 * 60);
+      
+      if (hoursSinceCheck < 24) {
+        return; // Skip - recently checked
+      }
+    }
+
+    // Check availability on YouTube
+    const isAvailable = await checkVideoAvailability(youtubeVideoId);
+    
+    // Update database
+    await supabase
+      .from('videos')
+      .update({
+        is_available: isAvailable,
+        last_availability_check: new Date().toISOString()
+      })
+      .eq('id', videoId);
+
+    if (!isAvailable) {
+      console.log(`📹 Video ${youtubeVideoId} marked as unavailable`);
+    }
+  } catch (error) {
+    console.error(`Error checking availability for video ${videoId}:`, error);
+    // Silently fail - don't block the request
+  }
+}
 
 const validateUserId = [
   param('userId').isUUID().withMessage('Invalid user ID')
@@ -305,6 +344,8 @@ router.get('/:userId/feed', authenticateToken, validateUserId, async (req: Reque
         description,
         created_at,
         user_id,
+        is_available,
+        last_availability_check,
         users:user_id (
           id,
           username,
@@ -312,6 +353,7 @@ router.get('/:userId/feed', authenticateToken, validateUserId, async (req: Reque
         )
       `)
       .in('user_id', followingIds)
+      .eq('is_available', true)
       .order('created_at', { ascending: false })
       .limit(50);
 
@@ -321,9 +363,17 @@ router.get('/:userId/feed', authenticateToken, validateUserId, async (req: Reque
       return;
     }
 
+    // Send response immediately
     res.status(200).json({ 
       videos: videos || [],
       count: videos?.length || 0
+    });
+
+    // Check availability in background (don't await - fire and forget)
+    videos?.forEach((video: any) => {
+      checkAndUpdateAvailability(video.id, video.youtube_video_id, video.last_availability_check).catch(err => {
+        // Silently fail - already logged in the function
+      });
     });
   } catch (error) {
     console.error('Get feed error:', error);

@@ -99,7 +99,7 @@ export const PWAInstallPrompt = () => {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-50 animate-slide-in">
-      <div className="bg-white dark:bg-petflix-dark rounded-lg shadow-2xl p-6 border-2 border-lightblue dark:border-petflix-orange">
+      <div className="bg-white dark:bg-petflix-dark rounded-lg shadow-2xl p-6 border-2 border-petflix-orange dark:border-petflix-orange">
         <div className="flex items-start gap-4">
           <div className="text-4xl">🐾</div>
           <div className="flex-1">
@@ -117,7 +117,7 @@ export const PWAInstallPrompt = () => {
                 id="dont-ask-again"
                 checked={dontAskAgain}
                 onChange={(e) => setDontAskAgain(e.target.checked)}
-                className="w-4 h-4 text-lightblue dark:text-petflix-orange bg-gray-100 dark:bg-petflix-gray border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange cursor-pointer"
+                className="w-4 h-4 text-petflix-orange dark:text-petflix-orange bg-gray-100 dark:bg-petflix-gray border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange cursor-pointer"
               />
               <label
                 htmlFor="dont-ask-again"
@@ -130,7 +130,7 @@ export const PWAInstallPrompt = () => {
             <div className="flex gap-2">
               <button
                 onClick={handleInstallClick}
-                className="flex-1 px-4 py-2 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded transition"
+                className="flex-1 px-4 py-2 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded transition"
               >
                 Install
               </button>

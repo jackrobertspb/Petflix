@@ -86,6 +86,42 @@ export async function getVideoMetadata(videoId: string): Promise<YouTubeVideo | 
 }
 
 /**
+ * Check if a YouTube video is still available
+ * Returns true if available, false if not found/unavailable
+ */
+export async function checkVideoAvailability(videoId: string): Promise<boolean> {
+  if (!YOUTUBE_API_KEY) {
+    console.warn('YouTube API key not configured - assuming video is available');
+    return true;
+  }
+
+  try {
+    const url = `${YOUTUBE_API_BASE}/videos?part=status&id=${videoId}&key=${YOUTUBE_API_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json() as any;
+
+    // Video not found or no items returned
+    if (!data.items || data.items.length === 0) {
+      return false;
+    }
+
+    const video = data.items[0];
+    
+    // Check if video is embeddable and public
+    const status = video.status;
+    const isAvailable = 
+      status.uploadStatus === 'processed' && 
+      (status.privacyStatus === 'public' || status.privacyStatus === 'unlisted');
+
+    return isAvailable;
+  } catch (error) {
+    console.error(`Error checking availability for video ${videoId}:`, error);
+    // On error, assume available to avoid false positives
+    return true;
+  }
+}
+
+/**
  * Search YouTube videos
  * Automatically adds pet-related context to searches
  */

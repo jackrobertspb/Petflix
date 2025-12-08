@@ -28,10 +28,23 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Don't clear auth state for auth endpoints (login/register) - those 401s are expected
+      const isAuthEndpoint = error.config?.url?.includes('/auth/login') || 
+                            error.config?.url?.includes('/auth/register');
+      
+      if (!isAuthEndpoint) {
+        // Token expired or invalid for protected endpoints
+        // Clear auth state but don't redirect - let AuthContext handle it
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        // Only redirect if we're not already on login/register page
+        const currentPath = window.location.pathname;
+        if (!currentPath.includes('/login') && !currentPath.includes('/register')) {
+          // Dispatch a custom event that AuthContext can listen to
+          window.dispatchEvent(new CustomEvent('auth:token-expired'));
+        }
+      }
     }
     return Promise.reject(error);
   }

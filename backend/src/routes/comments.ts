@@ -133,6 +133,7 @@ router.post('/', authenticateToken, validateCommentCreation, async (req: Request
           username: user?.username || 'Someone',
           commentText: newComment.text,
           videoId: video_id,
+          commentId: newComment.id, // Add commentId for deduplication
         });
       }
     } catch (notifError) {

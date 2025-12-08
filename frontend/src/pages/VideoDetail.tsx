@@ -4,7 +4,11 @@ import { api, videoLikesAPI, commentLikesAPI, commentsAPI } from '../services/ap
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { formatRelativeTime } from '../lib/dateUtils';
-import { trackRecentlyViewed } from '../lib/indexedDB';
+import { trackRecentlyViewed, removeRecentlyViewed } from '../lib/indexedDB';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 interface Video {
   id: string;
@@ -486,21 +490,37 @@ export const VideoDetail = () => {
   };
 
   const handleDeleteCommentClick = (commentId: string) => {
+    console.log('🗑️ Delete comment clicked:', commentId);
+    console.log('📊 Current state - showDeleteCommentModal:', showDeleteCommentModal);
+    console.log('📊 Current state - commentToDelete:', commentToDelete);
     setCommentToDelete(commentId);
     setShowDeleteCommentModal(true);
+    console.log('✅ After setState - showDeleteCommentModal should be true');
   };
 
   const handleConfirmDeleteComment = async () => {
-    if (!commentToDelete) return;
+    console.log('🗑️ Confirm delete comment called, commentToDelete:', commentToDelete);
+    if (!commentToDelete) {
+      console.error('❌ No commentToDelete set!');
+      return;
+    }
 
     try {
+      console.log('📡 Sending delete request for comment:', commentToDelete);
       await commentsAPI.deleteComment(commentToDelete);
+      console.log('✅ Comment deleted successfully');
       setComments(prev => prev.filter(c => c.id !== commentToDelete));
       toast.success('Comment deleted successfully');
       setShowDeleteCommentModal(false);
       setCommentToDelete(null);
     } catch (error: any) {
-      console.error('Failed to delete comment:', error);
+      console.error('❌ Failed to delete comment:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText
+      });
       toast.error('Failed to delete comment. Please try again.');
     }
   };
@@ -570,12 +590,34 @@ export const VideoDetail = () => {
   };
 
   const handleDeleteVideoClick = () => {
+    console.log('🗑️ Delete video clicked, video ID:', id);
+    console.log('📊 Current state - showDeleteVideoModal:', showDeleteVideoModal);
+    console.log('📊 Current user:', user);
     setShowDeleteVideoModal(true);
+    console.log('✅ After setState - showDeleteVideoModal should be true');
   };
 
   const handleConfirmDeleteVideo = async () => {
+    console.log('🗑️ Confirm delete video called, video ID:', id);
+    if (!id) {
+      console.error('❌ No video ID!');
+      return;
+    }
+
     try {
+      console.log('📡 Sending delete request for video:', id);
       await api.delete(`/videos/${id}`);
+      console.log('✅ Video deleted successfully');
+      
+      // Remove from IndexedDB if it exists there
+      try {
+        await removeRecentlyViewed(id);
+        console.log('✅ Video removed from recently viewed');
+      } catch (indexedDBError) {
+        // Don't fail if IndexedDB removal fails - it's optional
+        console.warn('⚠️ Failed to remove from IndexedDB:', indexedDBError);
+      }
+      
       toast.success('Video deleted successfully');
       setShowDeleteVideoModal(false);
       // Redirect to profile after a brief delay
@@ -583,7 +625,14 @@ export const VideoDetail = () => {
         navigate(`/profile/${user?.id}`);
       }, 1500);
     } catch (error: any) {
-      console.error('Failed to delete video:', error);
+      console.error('❌ Failed to delete video:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        url: `/videos/${id}`
+      });
       toast.error('Failed to delete video. Please try again.');
     }
   };
@@ -610,11 +659,11 @@ export const VideoDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-24 px-8 md:px-16 pb-12">
+    <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-20 sm:pt-24 px-4 sm:px-6 md:px-8 lg:px-16 pb-8 sm:pb-12">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Video Player & Info */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* YouTube Player */}
             <div className="aspect-video bg-black rounded-lg overflow-hidden">
               <iframe
@@ -630,9 +679,9 @@ export const VideoDetail = () => {
             </div>
 
             {/* Video Info */}
-            <div className="bg-white dark:bg-petflix-dark rounded-lg p-6 border border-gray-200 dark:border-transparent">
+            <div className="bg-white dark:bg-petflix-dark rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-transparent">
               <h1 
-                className={`text-3xl font-bold text-charcoal dark:text-white mb-4 cursor-pointer hover:text-petflix-orange transition break-all ${titleExpanded ? '' : 'line-clamp-3'}`}
+                className={`text-xl sm:text-2xl md:text-3xl font-bold text-charcoal dark:text-white mb-3 sm:mb-4 cursor-pointer hover:text-petflix-orange transition break-all ${titleExpanded ? '' : 'line-clamp-3'}`}
                 onClick={() => setTitleExpanded(!titleExpanded)}
                 title={titleExpanded ? "Click to collapse" : "Click to see full title"}
               >
@@ -657,19 +706,22 @@ export const VideoDetail = () => {
             </div>
 
             {/* Comments Section */}
-            <div className="bg-white dark:bg-petflix-dark rounded-lg p-6 border border-gray-200 dark:border-transparent">
-              <h2 className="text-2xl font-bold text-charcoal dark:text-white mb-6">
-                💬 Comments ({comments.length})
+            <div className="bg-white dark:bg-petflix-dark rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-transparent">
+              <h2 className="text-xl sm:text-2xl font-bold text-charcoal dark:text-white mb-4 sm:mb-6 flex items-center gap-2">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                Comments ({comments.length})
               </h2>
 
               {user ? (
                 <form onSubmit={handleSubmitComment} className="mb-8">
                   <div className="relative">
-                    <textarea
+                    <Textarea
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
                       placeholder="Add a comment..."
-                      className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded-lg focus:ring-2 focus:ring-petflix-orange focus:outline-none resize-none placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere"
+                      className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white focus:ring-2 focus:ring-petflix-orange resize-none placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere"
                       rows={3}
                       maxLength={280}
                       style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
@@ -681,13 +733,13 @@ export const VideoDetail = () => {
                       </p>
                     </div>
                   </div>
-                  <button
+                  <Button
                     type="submit"
                     disabled={submitting || !newComment.trim() || newComment.length > 280}
-                    className="mt-3 px-6 py-3 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="mt-3 px-6 py-3 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold"
                   >
                     {submitting ? 'Posting...' : 'Post Comment'}
-                  </button>
+                  </Button>
                 </form>
               ) : (
                 <div className="mb-8 p-4 bg-gray-100 dark:bg-petflix-gray rounded-lg border border-gray-300 dark:border-transparent">
@@ -728,10 +780,10 @@ export const VideoDetail = () => {
                             </div>
                             {editingComment === comment.id ? (
                               <div className="mb-3">
-                                <textarea
+                                <Textarea
                                   value={editText}
                                   onChange={(e) => setEditText(e.target.value)}
-                                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded-lg focus:ring-2 focus:ring-petflix-orange focus:outline-none resize-none border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere"
+                                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white focus:ring-2 focus:ring-petflix-orange resize-none border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere"
                                   rows={3}
                                   maxLength={280}
                                   style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
@@ -740,19 +792,25 @@ export const VideoDetail = () => {
                                   {editText.length}/280 characters
                                 </p>
                                 <div className="flex gap-2 mt-2">
-                                  <button
+                                  <Button
                                     onClick={() => handleSaveEdit(comment.id)}
                                     disabled={!editText.trim() || editText.length > 280}
-                                    className="px-4 py-2 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                    size="sm"
+                                    className="px-4 py-2 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold flex items-center gap-2"
                                   >
-                                    💾 Save
-                                  </button>
-                                  <button
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                    </svg>
+                                    Save
+                                  </Button>
+                                  <Button
                                     onClick={handleCancelEdit}
-                                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium rounded-lg transition text-sm"
+                                    size="sm"
+                                    variant="outline"
+                                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium"
                                   >
                                     Cancel
-                                  </button>
+                                  </Button>
                                 </div>
                               </div>
                             ) : (
@@ -761,42 +819,69 @@ export const VideoDetail = () => {
                                 
                                 {/* Comment Actions */}
                                 <div className="flex items-center gap-4 mb-3">
-                                  <button
+                                  <Button
                                     onClick={() => handleCommentLike(comment.id)}
                                     disabled={commentLikeLoading[comment.id]}
-                                    className={`flex items-center gap-1 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed ${
+                                    variant="ghost"
+                                    size="sm"
+                                    className={`flex items-center gap-1 text-sm font-medium ${
                                       commentLikes[comment.id]?.liked
                                         ? 'text-petflix-orange hover:text-petflix-red'
-                                        : 'text-gray-600 dark:text-gray-400 hover:text-lightblue dark:hover:text-petflix-orange'
+                                        : 'text-gray-600 dark:text-gray-400 hover:text-petflix-orange dark:hover:text-petflix-orange'
                                     }`}
                                   >
-                                    {commentLikeLoading[comment.id] ? '⏳' : commentLikes[comment.id]?.liked ? '❤️' : '🤍'} 
+                                    {commentLikeLoading[comment.id] ? (
+                                      <div className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                    ) : commentLikes[comment.id]?.liked ? (
+                                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                      </svg>
+                                    ) : (
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                      </svg>
+                                    )}
                                     <span>{commentLikes[comment.id]?.count || 0}</span>
-                                  </button>
+                                  </Button>
 
                                   {user && (
-                                    <button
+                                    <Button
                                       onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-lightblue dark:hover:text-petflix-orange font-medium transition"
+                                      variant="ghost"
+                                      size="sm"
+                                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-petflix-orange dark:hover:text-petflix-orange font-medium flex items-center gap-1"
                                     >
-                                      💬 Reply
-                                    </button>
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                                      </svg>
+                                      Reply
+                                    </Button>
                                   )}
 
                                   {user && user.id === comment.user_id && (
                                     <>
-                                      <button
+                                      <Button
                                         onClick={() => handleEditCommentClick(comment.id, comment.content)}
-                                        className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center gap-1"
                                       >
-                                        ✏️ Edit
-                                      </button>
-                                      <button
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Edit
+                                      </Button>
+                                      <Button
                                         onClick={() => handleDeleteCommentClick(comment.id)}
-                                        className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium flex items-center gap-1"
                                       >
-                                        🗑️ Delete
-                                      </button>
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Delete
+                                      </Button>
                                     </>
                                   )}
                                 </div>
@@ -806,11 +891,11 @@ export const VideoDetail = () => {
                             {/* Reply Input */}
                             {replyingTo === comment.id && (
                               <div className="mt-4 mb-4 pl-4 border-l-2 border-petflix-orange dark:border-petflix-orange">
-                                <textarea
+                                <Textarea
                                   value={replyText}
                                   onChange={(e) => setReplyText(e.target.value)}
                                   placeholder={`Reply to @${comment.username}...`}
-                                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded-lg focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange focus:outline-none resize-none border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere"
+                                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange resize-none border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere"
                                   rows={3}
                                   maxLength={280}
                                   style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
@@ -820,22 +905,25 @@ export const VideoDetail = () => {
                                   {replyText.length > 280 && ' - Reply is too long!'}
                                 </p>
                                 <div className="flex gap-2 mt-2">
-                                  <button
+                                  <Button
                                     onClick={() => handleSubmitReply(comment.id)}
                                     disabled={submitting || !replyText.trim() || replyText.length > 280}
-                                    className="px-4 py-2 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                    size="sm"
+                                    className="px-4 py-2 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold"
                                   >
                                     {submitting ? 'Posting...' : 'Post Reply'}
-                                  </button>
-                                  <button
+                                  </Button>
+                                  <Button
                                     onClick={() => {
                                       setReplyingTo(null);
                                       setReplyText('');
                                     }}
-                                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium rounded-lg transition text-sm"
+                                    size="sm"
+                                    variant="outline"
+                                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium"
                                   >
                                     Cancel
-                                  </button>
+                                  </Button>
                                 </div>
                               </div>
                             )}
@@ -862,10 +950,10 @@ export const VideoDetail = () => {
                                       </div>
                                       {editingComment === reply.id ? (
                                         <div className="mb-2">
-                                          <textarea
+                                          <Textarea
                                             value={editText}
                                             onChange={(e) => setEditText(e.target.value)}
-                                            className="w-full px-3 py-2 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded-lg focus:ring-2 focus:ring-petflix-orange focus:outline-none resize-none border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere text-sm"
+                                            className="w-full px-3 py-2 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white focus:ring-2 focus:ring-petflix-orange resize-none border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere text-sm"
                                             rows={2}
                                             maxLength={280}
                                             style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
@@ -874,19 +962,25 @@ export const VideoDetail = () => {
                                             {editText.length}/280 characters
                                           </p>
                                           <div className="flex gap-2 mt-2">
-                                            <button
+                                            <Button
                                               onClick={() => handleSaveEdit(reply.id)}
                                               disabled={!editText.trim() || editText.length > 280}
-                                              className="px-3 py-1 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded transition disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+                                              size="sm"
+                                              className="px-3 py-1 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold text-xs flex items-center gap-1"
                                             >
-                                              💾 Save
-                                            </button>
-                                            <button
+                                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                              </svg>
+                                              Save
+                                            </Button>
+                                            <Button
                                               onClick={handleCancelEdit}
-                                              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium rounded transition text-xs"
+                                              size="sm"
+                                              variant="outline"
+                                              className="px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium text-xs"
                                             >
                                               Cancel
-                                            </button>
+                                            </Button>
                                           </div>
                                         </div>
                                       ) : (
@@ -895,45 +989,72 @@ export const VideoDetail = () => {
                                           
                                           {/* Reply Actions */}
                                           <div className="flex items-center gap-3">
-                                            <button
+                                            <Button
                                               onClick={() => handleCommentLike(reply.id)}
                                               disabled={commentLikeLoading[reply.id]}
-                                              className={`flex items-center gap-1 text-xs font-medium transition disabled:opacity-50 disabled:cursor-not-allowed ${
+                                              variant="ghost"
+                                              size="sm"
+                                              className={`flex items-center gap-1 text-xs font-medium ${
                                                 commentLikes[reply.id]?.liked
                                                   ? 'text-petflix-orange hover:text-petflix-red'
-                                                  : 'text-gray-600 dark:text-gray-400 hover:text-lightblue dark:hover:text-petflix-orange'
+                                                  : 'text-gray-600 dark:text-gray-400 hover:text-petflix-orange dark:hover:text-petflix-orange'
                                               }`}
                                             >
-                                              {commentLikeLoading[reply.id] ? '⏳' : commentLikes[reply.id]?.liked ? '❤️' : '🤍'} 
+                                              {commentLikeLoading[reply.id] ? (
+                                                <div className="inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                                              ) : commentLikes[reply.id]?.liked ? (
+                                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                                </svg>
+                                              ) : (
+                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                </svg>
+                                              )}
                                               <span>{commentLikes[reply.id]?.count || 0}</span>
-                                            </button>
+                                            </Button>
 
                                             {user && (
-                                              <button
+                                              <Button
                                                 onClick={() => {
                                                   setReplyingTo(comment.id); // Reply to parent comment
                                                   setReplyText(`@${reply.username} `); // Mention the user
                                                 }}
-                                                className="text-xs text-gray-600 dark:text-gray-400 hover:text-lightblue dark:hover:text-petflix-orange font-medium transition"
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-xs text-gray-600 dark:text-gray-400 hover:text-petflix-orange dark:hover:text-petflix-orange font-medium flex items-center gap-1"
                                               >
-                                                💬 Reply
-                                              </button>
+                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                                                </svg>
+                                                Reply
+                                              </Button>
                                             )}
 
                                             {user && user.id === reply.user_id && (
                                               <>
-                                                <button
+                                                <Button
                                                   onClick={() => handleEditCommentClick(reply.id, reply.content)}
-                                                  className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition"
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center gap-1"
                                                 >
-                                                  ✏️ Edit
-                                                </button>
-                                                <button
+                                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                  </svg>
+                                                  Edit
+                                                </Button>
+                                                <Button
                                                   onClick={() => handleDeleteCommentClick(reply.id)}
-                                                  className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition"
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium flex items-center gap-1"
                                                 >
-                                                  🗑️ Delete
-                                                </button>
+                                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                  </svg>
+                                                  Delete
+                                                </Button>
                                               </>
                                             )}
                                           </div>
@@ -956,14 +1077,18 @@ export const VideoDetail = () => {
 
           {/* Sidebar Actions */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-petflix-dark rounded-lg p-6 sticky top-24 border border-gray-200 dark:border-transparent">
+            <div className="bg-white dark:bg-petflix-dark rounded-lg p-4 sm:p-6 sticky top-20 sm:top-24 border border-gray-200 dark:border-transparent">
               {/* Stats Section */}
               <div className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="font-bold text-charcoal dark:text-white text-lg mb-4">Stats</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                      <span className="text-lg">👁️</span> Views
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      Views
                     </span>
                     <span className="font-bold text-charcoal dark:text-white">
                       {video.view_count?.toLocaleString() || 0}
@@ -971,7 +1096,10 @@ export const VideoDetail = () => {
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                      <span className="text-lg">❤️</span> Likes
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                      </svg>
+                      Likes
                     </span>
                     <span className="font-bold text-charcoal dark:text-white">
                       {videoLikeCount.toLocaleString()}
@@ -979,7 +1107,10 @@ export const VideoDetail = () => {
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                      <span className="text-lg">💬</span> Comments
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                      Comments
                     </span>
                     <span className="font-bold text-charcoal dark:text-white">
                       {comments.length.toLocaleString()}
@@ -995,52 +1126,82 @@ export const VideoDetail = () => {
                   <>
                     <button 
                       onClick={handleOpenEditModal}
-                      className="w-full px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition"
+                      className="w-full px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
                     >
-                      ✏️ Edit Video
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      Edit Video
                     </button>
                     <button 
                       onClick={handleDeleteVideoClick}
-                      className="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition"
+                      className="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
                     >
-                      🗑️ Delete Video
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Delete Video
                     </button>
                     <div className="border-t border-gray-300 dark:border-gray-600 my-3"></div>
                   </>
                 )}
 
-                <button 
+                <Button 
                   onClick={handleVideoLike}
                   disabled={videoLikeLoading}
-                  className={`w-full px-4 py-3 font-medium rounded-lg transition ${
+                  variant={videoLiked ? 'default' : 'outline'}
+                  className={`w-full px-4 py-3 font-medium flex items-center justify-center gap-2 ${
                     videoLiked 
                       ? 'bg-petflix-orange hover:bg-petflix-red text-white' 
-                      : 'bg-gray-200 hover:bg-lightblue dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      : 'bg-gray-200 hover:bg-petflix-orange dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white'
+                  }`}
                 >
-                  {videoLikeLoading ? '⏳' : videoLiked ? '❤️' : '🤍'} {videoLiked ? 'Liked' : 'Like'} ({videoLikeCount})
-                </button>
-                <button 
+                  {videoLikeLoading ? (
+                    <div className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                  ) : videoLiked ? (
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  )}
+                  {videoLiked ? 'Liked' : 'Like'} ({videoLikeCount})
+                </Button>
+                <Button 
                   onClick={handleOpenPlaylistModal}
-                  className="w-full px-4 py-3 bg-gray-200 hover:bg-lightblue dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white font-medium rounded-lg transition"
+                  variant="outline"
+                  className="w-full px-4 py-3 bg-gray-200 hover:bg-petflix-orange dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white font-medium flex items-center justify-center gap-2"
                 >
-                  💾 Add to Playlist
-                </button>
-                <button 
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add to Playlist
+                </Button>
+                <Button 
                   onClick={handleOpenShareModal}
-                  className="w-full px-4 py-3 bg-gray-200 hover:bg-lightblue dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white font-medium rounded-lg transition"
+                  variant="outline"
+                  className="w-full px-4 py-3 bg-gray-200 hover:bg-petflix-orange dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white font-medium flex items-center justify-center gap-2"
                 >
-                  🔗 Share
-                </button>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  Share
+                </Button>
                 
                 {/* Only show report button if NOT owner */}
                 {(!user || user.id !== video?.shared_by_user_id) && (
-                  <button 
+                  <Button 
                     onClick={handleOpenReportModal}
-                    className="w-full px-4 py-3 bg-gray-200 hover:bg-red-500 dark:bg-petflix-gray dark:hover:bg-red-600 text-charcoal dark:text-white font-medium rounded-lg transition"
+                    variant="outline"
+                    className="w-full px-4 py-3 bg-gray-200 hover:bg-red-500 dark:bg-petflix-gray dark:hover:bg-red-600 text-charcoal dark:text-white font-medium flex items-center justify-center gap-2"
                   >
-                    🚨 Report Video
-                  </button>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Report Video
+                  </Button>
                 )}
               </div>
             </div>
@@ -1049,321 +1210,390 @@ export const VideoDetail = () => {
       </div>
 
       {/* Add to Playlist Modal */}
-      {showPlaylistModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 px-4">
-          <div className="bg-petflix-dark rounded-lg p-8 max-w-md w-full max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-charcoal dark:text-white">
-                Add to Playlist
-              </h2>
-              <button
-                onClick={() => setShowPlaylistModal(false)}
-                className="text-gray-600 dark:text-gray-400 hover:text-white text-2xl"
-              >
-                ✕
-              </button>
-            </div>
+      <Dialog open={showPlaylistModal} onOpenChange={setShowPlaylistModal}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Add to Playlist</DialogTitle>
+          </DialogHeader>
 
-            {loadingPlaylists ? (
-              <div className="text-center py-8 text-gray-600 dark:text-gray-400">
-                Loading playlists...
-              </div>
-            ) : playlists.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-600 dark:text-gray-400 mb-4">You don't have any playlists yet</p>
-                <Link
-                  to="/playlists"
-                  className="inline-block px-6 py-3 bg-petflix-orange hover:bg-petflix-red text-white font-bold rounded-lg transition"
-                  onClick={() => setShowPlaylistModal(false)}
-                >
+          {loadingPlaylists ? (
+            <div className="text-center py-8 text-gray-600 dark:text-gray-400">
+              Loading playlists...
+            </div>
+          ) : playlists.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">You don't have any playlists yet</p>
+              <Button
+                asChild
+                className="bg-petflix-orange hover:bg-petflix-red text-white font-bold"
+                onClick={() => setShowPlaylistModal(false)}
+              >
+                <Link to="/playlists">
                   Create Your First Playlist
                 </Link>
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="space-y-3 mb-6">
+                {playlists.map((playlist) => (
+                  <label
+                    key={playlist.id}
+                    className="flex items-start gap-3 px-4 py-3 bg-gray-50 dark:bg-petflix-gray hover:bg-gray-100 dark:hover:bg-petflix-gray/80 rounded-lg cursor-pointer transition"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedPlaylistIds.has(playlist.id)}
+                      onChange={() => handleTogglePlaylist(playlist.id)}
+                      className="mt-1 w-5 h-5 rounded border-gray-300 text-petflix-orange dark:text-petflix-orange focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange cursor-pointer"
+                    />
+                    <div className="flex-1">
+                      <div className="font-semibold text-charcoal dark:text-white">{playlist.name}</div>
+                      {playlist.description && (
+                        <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
+                          {playlist.description}
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                ))}
               </div>
-            ) : (
-              <>
-                <div className="space-y-3 mb-6">
-                  {playlists.map((playlist) => (
-                    <label
-                      key={playlist.id}
-                      className="flex items-start gap-3 px-4 py-3 bg-gray-50 dark:bg-petflix-gray hover:bg-gray-100 dark:hover:bg-petflix-gray/80 rounded-lg cursor-pointer transition"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedPlaylistIds.has(playlist.id)}
-                        onChange={() => handleTogglePlaylist(playlist.id)}
-                        className="mt-1 w-5 h-5 rounded border-gray-300 text-lightblue dark:text-petflix-orange focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange cursor-pointer"
-                      />
-                      <div className="flex-1">
-                        <div className="font-semibold text-charcoal dark:text-white">{playlist.name}</div>
-                        {playlist.description && (
-                          <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
-                            {playlist.description}
-                          </div>
-                        )}
-                      </div>
-                    </label>
-                  ))}
-                </div>
-                
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setShowPlaylistModal(false)}
-                    className="flex-1 px-6 py-3 bg-gray-200 dark:bg-petflix-gray hover:bg-gray-300 dark:hover:bg-petflix-gray/80 text-charcoal dark:text-white font-bold rounded-lg transition"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSaveToPlaylists}
-                    disabled={savingPlaylists}
-                    className="flex-1 px-6 py-3 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {savingPlaylists ? 'Saving...' : 'Save Changes'}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+              
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setShowPlaylistModal(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSaveToPlaylists}
+                  disabled={savingPlaylists}
+                  className="flex-1 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red"
+                >
+                  {savingPlaylists ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Report Video Modal */}
-      {showReportModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 px-4">
-          <div className="bg-white dark:bg-petflix-dark rounded-lg p-8 max-w-md w-full border border-gray-200 dark:border-transparent">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-charcoal dark:text-white">
-                🚨 Report Video
-              </h2>
-              <button
-                onClick={() => setShowReportModal(false)}
-                className="text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-white text-2xl"
+      <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              Report Video
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmitReport}>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-charcoal dark:text-gray-300 mb-3">
+                Why are you reporting this video? *
+              </label>
+              <select
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded focus:ring-2 focus:ring-red-600 focus:outline-none border border-gray-300 dark:border-transparent"
+                required
               >
-                ✕
-              </button>
+                <option value="">Select a reason...</option>
+                <option value="hate_speech">Hate Speech</option>
+                <option value="inappropriate_content">Inappropriate Content</option>
+                <option value="spam">Spam</option>
+                <option value="violence">Violence</option>
+                <option value="misleading">Misleading Information</option>
+                <option value="copyright">Copyright Violation</option>
+                <option value="other">Other</option>
+              </select>
             </div>
 
-            <form onSubmit={handleSubmitReport}>
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-charcoal dark:text-gray-300 mb-3">
-                  Why are you reporting this video? *
-                </label>
-                <select
-                  value={reportReason}
-                  onChange={(e) => setReportReason(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded focus:ring-2 focus:ring-red-600 focus:outline-none border border-gray-300 dark:border-transparent"
-                  required
-                >
-                  <option value="">Select a reason...</option>
-                  <option value="hate_speech">Hate Speech</option>
-                  <option value="inappropriate_content">Inappropriate Content</option>
-                  <option value="spam">Spam</option>
-                  <option value="violence">Violence</option>
-                  <option value="misleading">Misleading Information</option>
-                  <option value="copyright">Copyright Violation</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-charcoal dark:text-gray-300 mb-3">
+                Additional Details (Optional)
+              </label>
+              <Textarea
+                value={reportDetails}
+                onChange={(e) => setReportDetails(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white focus:ring-2 focus:ring-red-600 resize-none border border-gray-300 dark:border-transparent"
+                rows={4}
+                maxLength={500}
+                placeholder="Provide any additional context that might help us review this report..."
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                {reportDetails.length}/500 characters
+              </p>
+            </div>
 
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-charcoal dark:text-gray-300 mb-3">
-                  Additional Details (Optional)
-                </label>
-                <textarea
-                  value={reportDetails}
-                  onChange={(e) => setReportDetails(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded focus:ring-2 focus:ring-red-600 focus:outline-none resize-none border border-gray-300 dark:border-transparent"
-                  rows={4}
-                  maxLength={500}
-                  placeholder="Provide any additional context that might help us review this report..."
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                  {reportDetails.length}/500 characters
-                </p>
-              </div>
+            <div className="bg-gray-100 dark:bg-petflix-gray rounded-lg p-4 mb-6 border border-gray-300 dark:border-transparent">
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                <strong className="text-charcoal dark:text-white">Note:</strong> False reports may result in account restrictions. 
+                Reports are reviewed by our moderation team within 24-48 hours.
+              </p>
+            </div>
 
-              <div className="bg-gray-100 dark:bg-petflix-gray rounded-lg p-4 mb-6 border border-gray-300 dark:border-transparent">
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong className="text-charcoal dark:text-white">Note:</strong> False reports may result in account restrictions. 
-                  Reports are reviewed by our moderation team within 24-48 hours.
-                </p>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowReportModal(false)}
-                  className="flex-1 px-4 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium rounded transition"
-                  disabled={submittingReport}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submittingReport || !reportReason}
-                  className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {submittingReport ? 'Submitting...' : 'Submit Report'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                onClick={() => setShowReportModal(false)}
+                variant="outline"
+                className="flex-1"
+                disabled={submittingReport}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={submittingReport || !reportReason}
+                variant="destructive"
+                className="flex-1"
+              >
+                {submittingReport ? 'Submitting...' : 'Submit Report'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Share Modal */}
-      {showShareModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 px-4">
-          <div className="bg-white dark:bg-petflix-dark rounded-lg p-8 max-w-md w-full border border-gray-200 dark:border-transparent">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-charcoal dark:text-white">
-                🔗 Share Video
-              </h2>
-              <button
-                onClick={() => setShowShareModal(false)}
-                className="text-gray-600 dark:text-gray-400 hover:text-white text-2xl"
-              >
-                ✕
-              </button>
+      <Dialog open={showShareModal} onOpenChange={setShowShareModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              Share Video
+            </DialogTitle>
+          </DialogHeader>
+
+          {generatingShareUrl ? (
+            <div className="text-center py-8">
+              <div className="text-gray-600 dark:text-gray-400">Generating share link...</div>
             </div>
-
-            {generatingShareUrl ? (
-              <div className="text-center py-8">
-                <div className="text-gray-600 dark:text-gray-400">Generating share link...</div>
-              </div>
-            ) : (
-              <>
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-charcoal dark:text-white mb-3">
-                    Share Link
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={shareUrl || `${window.location.origin}/video/${id}`}
-                      readOnly
-                      className="flex-1 px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded border border-gray-300 dark:border-transparent text-sm"
-                    />
-                    <button
-                      onClick={handleCopyShareLink}
-                      className="px-4 py-3 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-medium rounded transition"
-                    >
-                      Copy
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-charcoal dark:text-white mb-3">
-                    Share to Social Media
-                  </label>
-                  <div className="grid grid-cols-3 gap-3">
-                    <button
-                      onClick={handleShareToFacebook}
-                      className="px-4 py-3 bg-[#1877F2] hover:bg-[#166FE5] text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
-                    >
-                      <span className="text-xl">📘</span>
-                      <span>Facebook</span>
-                    </button>
-                    <button
-                      onClick={handleShareToTwitter}
-                      className="px-4 py-3 bg-[#1DA1F2] hover:bg-[#1A91DA] text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
-                    >
-                      <span className="text-xl">🐦</span>
-                      <span>Twitter</span>
-                    </button>
-                    <button
-                      onClick={handleShareToInstagram}
-                      className="px-4 py-3 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] hover:opacity-90 text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
-                    >
-                      <span className="text-xl">📷</span>
-                      <span>Instagram</span>
-                    </button>
-                  </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
-                    Instagram: Link copied to clipboard. Paste it in your post or story.
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => setShowShareModal(false)}
-                  className="w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium rounded transition"
-                >
-                  Close
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Edit Video Modal */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 px-4">
-          <div className="bg-white dark:bg-petflix-dark rounded-lg p-8 max-w-md w-full border border-gray-200 dark:border-transparent">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-charcoal dark:text-white">
-                ✏️ Edit Video
-              </h2>
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="text-gray-600 dark:text-gray-400 hover:text-white text-2xl"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveVideoEdit}>
+          ) : (
+            <>
               <div className="mb-6">
                 <label className="block text-sm font-medium text-charcoal dark:text-white mb-3">
-                  Title *
+                  Share Link
                 </label>
-                <input
-                  type="text"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange focus:outline-none border border-gray-300 dark:border-gray-600"
-                  required
-                  maxLength={255}
-                />
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    value={shareUrl || `${window.location.origin}/video/${id}`}
+                    readOnly
+                    className="flex-1 text-sm"
+                  />
+                  <Button
+                    onClick={handleCopyShareLink}
+                    className="bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-white"
+                  >
+                    Copy
+                  </Button>
+                </div>
               </div>
 
               <div className="mb-6">
                 <label className="block text-sm font-medium text-charcoal dark:text-white mb-3">
-                  Description
+                  Share to Social Media
                 </label>
-                <textarea
-                  value={editDescription}
-                  onChange={(e) => setEditDescription(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange focus:outline-none resize-none border border-gray-300 dark:border-gray-600"
-                  rows={4}
-                  maxLength={1000}
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                  {editDescription.length}/1000 characters
+                <div className="grid grid-cols-3 gap-3">
+                  <Button
+                    onClick={handleShareToFacebook}
+                    className="bg-[#1877F2] hover:bg-[#166FE5] text-white flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    <span>Facebook</span>
+                  </Button>
+                  <Button
+                    onClick={handleShareToTwitter}
+                    className="bg-[#1DA1F2] hover:bg-[#1A91DA] text-white flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                    </svg>
+                    <span>Twitter</span>
+                  </Button>
+                  <Button
+                    onClick={handleShareToInstagram}
+                    className="bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] hover:opacity-90 text-white flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                    <span>Instagram</span>
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
+                  Instagram: Link copied to clipboard. Paste it in your post or story.
                 </p>
               </div>
 
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowEditModal(false)}
-                  className="flex-1 px-4 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium rounded transition"
-                  disabled={savingEdit}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={savingEdit || !editTitle.trim()}
-                  className="flex-1 px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {savingEdit ? 'Saving...' : 'Save Changes'}
-                </button>
-              </div>
-            </form>
+              <Button
+                onClick={() => setShowShareModal(false)}
+                variant="outline"
+                className="w-full"
+              >
+                Close
+              </Button>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Video Modal */}
+      <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Edit Video
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveVideoEdit}>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-charcoal dark:text-white mb-3">
+                Title *
+              </label>
+              <Input
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="w-full"
+                required
+                maxLength={255}
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-charcoal dark:text-white mb-3">
+                Description
+              </label>
+              <Textarea
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                className="w-full resize-none"
+                rows={4}
+                maxLength={1000}
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                {editDescription.length}/1000 characters
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                onClick={() => setShowEditModal(false)}
+                variant="outline"
+                className="flex-1"
+                disabled={savingEdit}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={savingEdit || !editTitle.trim()}
+                className="flex-1 bg-blue-500 hover:bg-blue-600"
+              >
+                {savingEdit ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Video Modal */}
+      <Dialog open={showDeleteVideoModal} onOpenChange={setShowDeleteVideoModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-red-600 dark:text-red-400 flex items-center gap-2">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Delete Video
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-charcoal dark:text-white mb-4">
+              Are you sure you want to delete this video? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                onClick={() => {
+                  console.log('❌ Delete video cancelled');
+                  setShowDeleteVideoModal(false);
+                }}
+                variant="outline"
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleConfirmDeleteVideo}
+                variant="destructive"
+                className="flex-1 bg-red-600 hover:bg-red-700"
+              >
+                Delete Video
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Comment Modal */}
+      <Dialog open={showDeleteCommentModal} onOpenChange={setShowDeleteCommentModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-red-600 dark:text-red-400 flex items-center gap-2">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Delete Comment
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-charcoal dark:text-white mb-4">
+              Are you sure you want to delete this comment? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                onClick={() => {
+                  console.log('❌ Delete comment cancelled');
+                  setShowDeleteCommentModal(false);
+                  setCommentToDelete(null);
+                }}
+                variant="outline"
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleConfirmDeleteComment}
+                variant="destructive"
+                className="flex-1 bg-red-600 hover:bg-red-700"
+              >
+                Delete Comment
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

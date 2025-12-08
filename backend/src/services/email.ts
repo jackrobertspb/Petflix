@@ -89,6 +89,7 @@ async function sendViaSendGrid(options: EmailOptions): Promise<void> {
   }
 
   // Dynamic import to avoid requiring sendgrid in development
+  // @ts-expect-error - Optional dependency, types may not be available
   const sgMail = await import('@sendgrid/mail');
   sgMail.default.setApiKey(apiKey);
 

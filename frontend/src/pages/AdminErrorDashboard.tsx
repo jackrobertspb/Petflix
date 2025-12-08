@@ -153,7 +153,7 @@ export const AdminErrorDashboard = () => {
   if (loading && !errors.length) {
     return (
       <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-24 px-8 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-lightblue dark:border-petflix-orange border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-petflix-orange dark:border-petflix-orange border-t-transparent"></div>
       </div>
     );
   }
@@ -234,7 +234,7 @@ export const AdminErrorDashboard = () => {
                   setLevelFilter(e.target.value as any);
                   setPage(1);
                 }}
-                className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-charcoal dark:text-white rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+                className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-charcoal dark:text-white rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
               >
                 <option value="all">All Levels</option>
                 <option value="error">Errors Only</option>
@@ -314,7 +314,7 @@ export const AdminErrorDashboard = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button
                         onClick={() => setSelectedError(error)}
-                        className="text-lightblue dark:text-petflix-orange hover:underline"
+                        className="text-petflix-orange dark:text-petflix-orange hover:underline"
                       >
                         Details
                       </button>

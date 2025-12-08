@@ -1089,7 +1089,7 @@ export const TestChecklist = () => {
                 <select
                   value={filterPriority}
                   onChange={(e) => setFilterPriority(e.target.value)}
-                  className="px-4 py-2 bg-gray-50 dark:bg-petflix-gray text-charcoal dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+                  className="px-4 py-2 bg-gray-50 dark:bg-petflix-gray text-charcoal dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
                 >
                   <option value="all">All Priorities</option>
                   <option value="critical">🔴 Critical</option>
@@ -1103,7 +1103,7 @@ export const TestChecklist = () => {
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="px-4 py-2 bg-gray-50 dark:bg-petflix-gray text-charcoal dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+                  className="px-4 py-2 bg-gray-50 dark:bg-petflix-gray text-charcoal dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
                 >
                   <option value="all">All Statuses</option>
                   <option value="pending">Pending</option>
@@ -1249,7 +1249,7 @@ export const TestChecklist = () => {
                                 value={result.notes}
                                 onChange={(e) => updateTest(test.id, result.status, e.target.value)}
                                 placeholder="Add notes about this test..."
-                                className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-petflix-gray text-charcoal dark:text-white border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+                                className="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-petflix-gray text-charcoal dark:text-white border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
                                 rows={2}
                               />
                             </div>

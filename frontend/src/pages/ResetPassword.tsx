@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useToast } from '../contexts/ToastContext';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -93,21 +95,23 @@ export const ResetPassword = () => {
                 New Password
               </label>
               <div className="relative flex items-center">
-                <input
+                <Input
                   type={showNewPassword ? 'text' : 'password'}
                   id="newPassword"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 dark:bg-petflix-dark-gray dark:border-gray-600 dark:text-white rounded-lg focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange focus:border-transparent"
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 dark:bg-petflix-dark-gray dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
                   placeholder="Enter new password"
                   required
                   minLength={8}
                 />
-                <button
+                <Button
                   type="button"
                   onClick={() => newPassword && setShowNewPassword(!showNewPassword)}
                   disabled={!newPassword}
-                  className="absolute right-4 text-gray-500 dark:text-gray-400 hover:text-charcoal dark:hover:text-white transition disabled:opacity-30 disabled:cursor-not-allowed"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-4 text-gray-500 dark:text-gray-400 hover:text-charcoal dark:hover:text-white disabled:opacity-30"
                   aria-label="Toggle password visibility"
                 >
                   {showNewPassword ? (
@@ -120,7 +124,7 @@ export const ResetPassword = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   )}
-                </button>
+                </Button>
               </div>
               <p className="mt-2 text-xs text-gray-500 dark:text-gray-500">
                 Must be at least 8 characters with uppercase, lowercase, and number
@@ -132,21 +136,23 @@ export const ResetPassword = () => {
                 Confirm New Password
               </label>
               <div className="relative flex items-center">
-                <input
+                <Input
                   type={showConfirmPassword ? 'text' : 'password'}
                   id="confirmPassword"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 dark:bg-petflix-dark-gray dark:border-gray-600 dark:text-white rounded-lg focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange focus:border-transparent"
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 dark:bg-petflix-dark-gray dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
                   placeholder="Confirm new password"
                   required
                   minLength={8}
                 />
-                <button
+                <Button
                   type="button"
                   onClick={() => confirmPassword && setShowConfirmPassword(!showConfirmPassword)}
                   disabled={!confirmPassword}
-                  className="absolute right-4 text-gray-500 dark:text-gray-400 hover:text-charcoal dark:hover:text-white transition disabled:opacity-30 disabled:cursor-not-allowed"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-4 text-gray-500 dark:text-gray-400 hover:text-charcoal dark:hover:text-white disabled:opacity-30"
                   aria-label="Toggle confirm password visibility"
                 >
                   {showConfirmPassword ? (
@@ -159,17 +165,17 @@ export const ResetPassword = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   )}
-                </button>
+                </Button>
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-petflix-orange hover:bg-petflix-red text-white font-bold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-petflix-orange hover:bg-petflix-red text-white font-bold py-3"
             >
               {loading ? 'Resetting...' : 'Reset Password'}
-            </button>
+            </Button>
           </form>
 
           <div className="mt-6 text-center">

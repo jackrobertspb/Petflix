@@ -100,7 +100,7 @@ export const AdminSettings = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-24 px-8 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-lightblue dark:border-petflix-orange border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-petflix-orange dark:border-petflix-orange border-t-transparent"></div>
       </div>
     );
   }
@@ -207,7 +207,7 @@ export const AdminSettings = () => {
               disabled={!isValid || saving}
               className={`flex-1 px-6 py-3 rounded-lg font-bold text-white transition-all ${
                 isValid && !saving
-                  ? 'bg-lightblue dark:bg-petflix-orange hover:opacity-90 hover:scale-105'
+                  ? 'bg-petflix-orange dark:bg-petflix-orange hover:opacity-90 hover:scale-105'
                   : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
               }`}
             >
@@ -291,7 +291,7 @@ const WeightInput = ({ label, description, value, onChange, percentage }: Weight
         <label className="font-bold text-charcoal dark:text-white">
           {label}
         </label>
-        <span className="text-xl font-bold text-lightblue dark:text-petflix-orange">
+        <span className="text-xl font-bold text-petflix-orange dark:text-petflix-orange">
           {percentage}%
         </span>
       </div>
@@ -318,7 +318,7 @@ const WeightInput = ({ label, description, value, onChange, percentage }: Weight
           step="0.01"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-20 px-3 py-2 bg-gray-100 dark:bg-gray-800 text-charcoal dark:text-white rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+          className="w-20 px-3 py-2 bg-gray-100 dark:bg-gray-800 text-charcoal dark:text-white rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
         />
       </div>
     </div>

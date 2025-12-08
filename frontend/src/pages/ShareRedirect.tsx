@@ -61,7 +61,7 @@ export const ShareRedirect = () => {
   return (
     <div className="min-h-screen bg-cream-light dark:bg-petflix-black flex items-center justify-center">
       <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-lightblue dark:border-petflix-orange border-t-transparent"></div>
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-petflix-orange dark:border-petflix-orange border-t-transparent"></div>
         <p className="mt-4 text-charcoal dark:text-white">Redirecting to video...</p>
       </div>
     </div>

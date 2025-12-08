@@ -7,12 +7,51 @@ import {
   validateYouTubeUrl,
   extractVideoId,
   getVideoMetadata,
-  searchYouTubeVideos
+  searchYouTubeVideos,
+  checkVideoAvailability
 } from '../services/youtube.js';
 import { queueNotification } from '../services/notificationGrouping.js';
 import { uploadLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
+
+/**
+ * Helper function to check and update video availability in the background
+ * Only checks videos that haven't been checked in the last 24 hours
+ */
+async function checkAndUpdateAvailability(videoId: string, youtubeVideoId: string, lastCheck: string | null) {
+  try {
+    // Skip if checked within last 24 hours
+    if (lastCheck) {
+      const lastCheckTime = new Date(lastCheck).getTime();
+      const now = Date.now();
+      const hoursSinceCheck = (now - lastCheckTime) / (1000 * 60 * 60);
+      
+      if (hoursSinceCheck < 24) {
+        return; // Skip - recently checked
+      }
+    }
+
+    // Check availability on YouTube
+    const isAvailable = await checkVideoAvailability(youtubeVideoId);
+    
+    // Update database
+    await supabase
+      .from('videos')
+      .update({
+        is_available: isAvailable,
+        last_availability_check: new Date().toISOString()
+      })
+      .eq('id', videoId);
+
+    if (!isAvailable) {
+      console.log(`📹 Video ${youtubeVideoId} marked as unavailable`);
+    }
+  } catch (error) {
+    console.error(`Error checking availability for video ${videoId}:`, error);
+    // Silently fail - don't block the request
+  }
+}
 
 // Validation rules
 const validateVideoCreation = [
@@ -196,11 +235,12 @@ router.post('/', uploadLimiter, authenticateToken, validateVideoCreation, async 
 // GET /api/v1/videos/search - Search Petflix's shared videos (query optional - can browse all)
 router.get('/search', optionalAuth, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { q, sort, page, limit: limitParam } = req.query;
+    const { q, sort, page, limit: limitParam, show_unavailable } = req.query;
 
     const sortOption = (sort as string) || 'relevance'; // Default to relevance
     const hasQuery = q && typeof q === 'string' && q.trim().length > 0;
     const searchTerm = hasQuery ? `%${q}%` : null; // For ILIKE pattern matching
+    const showUnavailable = show_unavailable === 'true';
     
     // Pagination
     const pageNum = parseInt(page as string) || 1;
@@ -218,12 +258,19 @@ router.get('/search', optionalAuth, async (req: Request, res: Response): Promise
         created_at,
         view_count,
         user_id,
+        is_available,
+        last_availability_check,
         users!videos_user_id_fkey (
           id,
           username,
           profile_picture_url
         )
       `, { count: 'exact' }); // Get total count for pagination
+
+    // Filter out unavailable videos unless explicitly requested
+    if (!showUnavailable) {
+      videosQuery = videosQuery.eq('is_available', true);
+    }
 
     // Apply search filter only if query exists
     if (hasQuery && searchTerm) {
@@ -277,6 +324,7 @@ router.get('/search', optionalAuth, async (req: Request, res: Response): Promise
         likes_count: likesCount || 0,
         comments_count: commentsCount || 0,
         engagement: engagement,
+        is_available: video.is_available !== false, // Default to true if null
         user: {
           id: user.id,
           username: user.username,
@@ -336,17 +384,17 @@ router.get('/search', optionalAuth, async (req: Request, res: Response): Promise
     const userId = req.userId || null;
     if (userId && hasQuery && q) {
       // Fire and forget - don't wait for it
-      supabase
+      Promise.resolve(supabase
         .from('search_history')
         .insert({
           user_id: userId,
           search_query: q as string,
           search_results_count: formattedVideos.length
-        })
+        }))
         .then(() => {
           // Success - no need to log
         })
-        .catch(err => {
+        .catch((err: any) => {
           console.error('Failed to track search history:', err);
         });
     }
@@ -356,6 +404,7 @@ router.get('/search', optionalAuth, async (req: Request, res: Response): Promise
     const hasNextPage = pageNum < totalPages;
     const hasPrevPage = pageNum > 1;
 
+    // Send response immediately
     res.status(200).json({
       videos: formattedVideos,
       pagination: {
@@ -366,6 +415,13 @@ router.get('/search', optionalAuth, async (req: Request, res: Response): Promise
         has_next_page: hasNextPage,
         has_prev_page: hasPrevPage
       }
+    });
+
+    // Check availability in background (don't await - fire and forget)
+    videos?.forEach((video: any) => {
+      checkAndUpdateAvailability(video.id, video.youtube_video_id, video.last_availability_check).catch(err => {
+        // Silently fail - already logged in the function
+      });
     });
   } catch (error) {
     console.error('Search videos error:', error);
@@ -662,7 +718,7 @@ router.delete('/:videoId', authenticateToken, async (req: Request, res: Response
 router.post('/:videoId/share-url', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const { videoId } = req.params;
-    const userId = req.userId!;
+    // const _userId = req.userId!; // Reserved for future authorization check
 
     if (!videoId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
       res.status(400).json({ error: 'Invalid video ID format' });
@@ -928,9 +984,10 @@ router.get('/trending', optionalAuth, async (req: Request, res: Response): Promi
 // GET /api/v1/videos - Get all videos (for feed)
 router.get('/', optionalAuth, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { limit = 20, offset = 0 } = req.query;
+    const { limit = 20, offset = 0, show_unavailable = 'false' } = req.query;
+    const showUnavailable = show_unavailable === 'true';
 
-    const { data: videos, error } = await supabase
+    let query = supabase
       .from('videos')
       .select(`
         id,
@@ -940,11 +997,20 @@ router.get('/', optionalAuth, async (req: Request, res: Response): Promise<void>
         created_at,
         view_count,
         user_id,
+        is_available,
+        last_availability_check,
         users:user_id (
           username,
           profile_picture_url
         )
-      `)
+      `);
+
+    // Filter out unavailable videos unless explicitly requested
+    if (!showUnavailable) {
+      query = query.eq('is_available', true);
+    }
+
+    const { data: videos, error } = await query
       .order('created_at', { ascending: false })
       .range(Number(offset), Number(offset) + Number(limit) - 1);
 
@@ -965,11 +1031,20 @@ router.get('/', optionalAuth, async (req: Request, res: Response): Promise<void>
         created_at: video.created_at,
         shared_by_user_id: video.user_id,
         username: user?.username || null,
-        profile_picture_url: user?.profile_picture_url || null
+        profile_picture_url: user?.profile_picture_url || null,
+        is_available: video.is_available !== false // Default to true if null
       };
     }) || [];
 
+    // Send response immediately
     res.status(200).json({ videos: formattedVideos });
+
+    // Check availability in background (don't await - fire and forget)
+    videos?.forEach((video: any) => {
+      checkAndUpdateAvailability(video.id, video.youtube_video_id, video.last_availability_check).catch(err => {
+        // Silently fail - already logged in the function
+      });
+    });
   } catch (error) {
     console.error('Get all videos error:', error);
     res.status(500).json({ error: 'Internal server error' });

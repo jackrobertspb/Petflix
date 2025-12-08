@@ -46,8 +46,9 @@ const transports: winston.transport[] = [
   }),
 ];
 
-// File transport (only in production or if explicitly enabled)
-if (process.env.NODE_ENV === 'production' || process.env.LOG_TO_FILE === 'true') {
+// File transport (only in production or if explicitly enabled, but NOT in serverless/Vercel)
+// Vercel serverless functions don't support file system writes
+if ((process.env.NODE_ENV === 'production' || process.env.LOG_TO_FILE === 'true') && !process.env.VERCEL && !process.env.VERCEL_ENV) {
   // Daily rotate file for all logs
   transports.push(
     new DailyRotateFile({
@@ -124,7 +125,7 @@ export async function logErrorToDatabase(error: {
 export function errorLoggerMiddleware(
   err: any,
   req: any,
-  res: any,
+  _res: any,
   next: any
 ) {
   const errorDetails = {

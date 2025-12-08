@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authAPI } from '../services/api';
+import { authAPI, usersAPI } from '../services/api';
 
 interface User {
   id: string;
@@ -7,6 +7,7 @@ interface User {
   email: string;
   profile_picture_url?: string;
   bio?: string;
+  user_number?: number;
 }
 
 interface AuthContextType {
@@ -26,16 +27,65 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize auth state from localStorage
+  // Initialize auth state from localStorage and validate token
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
+    const initializeAuth = async () => {
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+      if (storedToken && storedUser) {
+        try {
+          // Validate token by making a lightweight API call
+          // Use the user's own profile endpoint to verify token is valid
+          const userData = JSON.parse(storedUser);
+          
+          // Set user immediately from localStorage (optimistic)
+          setToken(storedToken);
+          setUser(userData);
+          
+          // Validate token in background
+          try {
+            await usersAPI.getProfile(userData.id);
+            console.log('✅ Token validated, user restored from localStorage');
+          } catch (validationError: any) {
+            // Only clear if it's a 401 (unauthorized) - other errors might be network issues
+            if (validationError.response?.status === 401) {
+              console.log('❌ Token validation failed (401), clearing auth state');
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              setToken(null);
+              setUser(null);
+            } else {
+              // Network error or other issue - keep the user logged in
+              console.warn('⚠️ Token validation failed (non-401), keeping user logged in:', validationError.message);
+            }
+          }
+        } catch (parseError) {
+          // Failed to parse user data
+          console.error('❌ Failed to parse stored user data, clearing auth state');
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setToken(null);
+          setUser(null);
+        }
+      }
+      setLoading(false);
+    };
+
+    initializeAuth();
+
+    // Listen for token expiration events from API interceptor
+    const handleTokenExpired = () => {
+      console.log('🔔 Token expired event received');
+      setToken(null);
+      setUser(null);
+    };
+
+    window.addEventListener('auth:token-expired', handleTokenExpired);
+
+    return () => {
+      window.removeEventListener('auth:token-expired', handleTokenExpired);
+    };
   }, []);
 
   const login = async (email: string, password: string) => {

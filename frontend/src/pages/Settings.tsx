@@ -4,6 +4,10 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useToast } from '../contexts/ToastContext';
 import { api } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   subscribeToPushNotifications,
   unsubscribeFromPushNotifications,
@@ -22,6 +26,7 @@ export const Settings = () => {
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [profilePicturePreview, setProfilePicturePreview] = useState<string | null>(null);
   const [uploadingPicture, setUploadingPicture] = useState(false);
+  const [profilePictureVersion, setProfilePictureVersion] = useState(0); // Force image reload
   const [email, setEmail] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingEmail, setSavingEmail] = useState(false);
@@ -71,7 +76,10 @@ export const Settings = () => {
       const response = await api.get(`/users/${user.id}`);
       const userData = response.data.user;
       setBio(userData.bio || '');
-      setProfilePictureUrl(userData.profile_picture_url || '');
+      // Add cache-busting timestamp to profile picture URL when loading from database
+      const baseUrl = userData.profile_picture_url || '';
+      const urlWithCacheBust = baseUrl ? `${baseUrl.split('?')[0]}?t=${Date.now()}` : '';
+      setProfilePictureUrl(urlWithCacheBust);
       setEmail(userData.email || '');
     } catch (error) {
       console.error('Failed to load user data:', error);
@@ -131,22 +139,31 @@ export const Settings = () => {
         imageType: profilePictureFile.type,
       });
 
-      // Update local state with new URL
+      // Update local state with new URL (backend already includes cache-busting timestamp)
       const newUrl = response.data.profile_picture_url;
-      setProfilePictureUrl(newUrl);
+      
+      // Clear preview and file first
       setProfilePictureFile(null);
       setProfilePicturePreview(null);
+      
+      // Increment version to force image reload
+      setProfilePictureVersion(prev => prev + 1);
+      
+      // Update URL with fresh cache-busting parameter
+      const baseUrl = newUrl.split('?')[0];
+      const urlWithFreshTimestamp = `${baseUrl}?t=${Date.now()}`;
+      setProfilePictureUrl(urlWithFreshTimestamp);
       
       // Update auth context with new profile picture
       if (user && updateUser) {
         updateUser({
           ...user,
-          profile_picture_url: newUrl,
+          profile_picture_url: urlWithFreshTimestamp,
         });
       }
-
-      // Reload user data to ensure everything is in sync
-      await loadUserData();
+      
+      // Don't reload user data immediately - we already have the new URL
+      // The image will reload because of the version change and new timestamp
 
       toast.success('Profile picture uploaded successfully!');
     } catch (error: any) {
@@ -158,20 +175,47 @@ export const Settings = () => {
   };
 
   const handleSaveProfile = async () => {
-    if (!user) return;
+    console.log('💾 Save profile clicked');
+    console.log('📊 Current state - user:', user?.id, 'bio:', bio, 'profilePictureUrl:', profilePictureUrl);
+    
+    if (!user) {
+      console.error('❌ No user found, cannot save profile');
+      return;
+    }
 
     setSavingProfile(true);
+    console.log('📡 Sending PATCH request to:', `/users/${user.id}`);
+    console.log('📦 Request body:', { bio, profile_picture_url: profilePictureUrl || null });
+    
     try {
-      await api.patch(`/users/${user.id}`, {
+      const response = await api.patch(`/users/${user.id}`, {
         bio,
         profile_picture_url: profilePictureUrl || null,
       });
+      console.log('✅ Profile update successful:', response.data);
       toast.success('Profile updated successfully!');
+      
+      // Update user in context if response includes user data
+      if (response.data?.user && updateUser) {
+        console.log('🔄 Updating user context with new data');
+        updateUser(response.data.user);
+      }
+      
+      // Reload user data to ensure sync
+      await loadUserData();
     } catch (error: any) {
-      console.error('Failed to update profile:', error);
+      console.error('❌ Failed to update profile:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        url: `/users/${user.id}`
+      });
       toast.error(error?.response?.data?.message || 'Failed to update profile');
     } finally {
       setSavingProfile(false);
+      console.log('🏁 Save profile finished');
     }
   };
 
@@ -180,8 +224,19 @@ export const Settings = () => {
 
     setSavingEmail(true);
     try {
-      await api.patch(`/users/${user.id}/email`, { email });
-      toast.success('Email updated successfully!');
+      const response = await api.patch(`/users/${user.id}/email`, { email });
+      
+      // Email is updated immediately
+      const message = response.data?.message || 'Email address updated successfully.';
+      toast.success(message);
+      
+      // Update user in context if provided
+      if (response.data?.user) {
+        updateUser(response.data.user);
+      }
+      
+      // Reload user data to ensure everything is in sync
+      await loadUserData();
     } catch (error: any) {
       console.error('Failed to update email:', error);
       const errorMessage = error?.response?.data?.message || 'Failed to update email';
@@ -252,9 +307,9 @@ export const Settings = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-24 px-8">
+      <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-20 sm:pt-24 px-4 sm:px-6 md:px-8">
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-3xl font-bold text-charcoal dark:text-white mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-charcoal dark:text-white mb-4">
             Please sign in to view settings
           </h1>
         </div>
@@ -263,9 +318,9 @@ export const Settings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-24 px-8 pb-16">
+    <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-20 sm:pt-24 px-4 sm:px-6 md:px-8 lg:px-16 pb-12 sm:pb-16">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold text-charcoal dark:text-white mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-charcoal dark:text-white mb-6 sm:mb-8">
           ⚙️ Settings
         </h1>
 
@@ -283,8 +338,14 @@ export const Settings = () => {
             </div>
             <div>
               <span className="text-gray-600 dark:text-gray-400">User ID:</span>
-              <span className="ml-2 text-charcoal dark:text-white font-mono text-sm">
-                {user.id}
+              <span className="ml-2 text-charcoal dark:text-white font-bold text-lg">
+                {user.user_number || 'N/A'}
+              </span>
+            </div>
+            <div>
+              <span className="text-gray-600 dark:text-gray-400">Member Since:</span>
+              <span className="ml-2 text-charcoal dark:text-white font-semibold">
+                {user.created_at ? new Date(user.created_at).toLocaleDateString('en-GB') : 'Unknown'}
               </span>
             </div>
           </div>
@@ -307,7 +368,7 @@ export const Settings = () => {
                 placeholder="Tell us about yourself and your love for pets..."
                 maxLength={255}
                 rows={4}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange resize-none"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange resize-none"
               />
               <div className="text-right text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {bio.length}/255
@@ -324,9 +385,19 @@ export const Settings = () => {
                 {(profilePicturePreview || profilePictureUrl) && (
                   <div className="relative inline-block">
                     <img
+                      key={`profile-pic-${profilePictureVersion}-${profilePictureUrl || profilePicturePreview || 'default'}`}
                       src={profilePicturePreview || profilePictureUrl || ''}
                       alt="Profile preview"
                       className="w-32 h-32 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
+                      onError={(e) => {
+                        // If image fails to load, try removing cache-busting and reloading
+                        const target = e.target as HTMLImageElement;
+                        const currentSrc = target.src;
+                        if (currentSrc.includes('?t=')) {
+                          const baseUrl = currentSrc.split('?')[0];
+                          target.src = `${baseUrl}?t=${Date.now()}`;
+                        }
+                      }}
                     />
                     {profilePicturePreview && (
                       <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded">
@@ -336,8 +407,10 @@ export const Settings = () => {
                   </div>
                 )}
                 {!profilePicturePreview && !profilePictureUrl && (
-                  <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-petflix-gray flex items-center justify-center text-6xl">
-                    🐾
+                  <div className="w-32 h-32 rounded-full bg-[#e5e7eb] dark:bg-[#e5e7eb] flex items-center justify-center">
+                    <svg className="w-12 h-12 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 512 512">
+                      <path d="M256 224c-79.41 0-192 122.76-192 200.25 0 34.9 26.81 55.75 71.74 55.75 48.84 0 81.09-25.08 120.26-25.08 39.51 0 71.85 25.08 120.26 25.08 44.93 0 71.74-20.85 71.74-55.75C448 346.76 335.41 224 256 224zm-147.28-12.61c-10.4-34.65-42.44-57.09-71.56-50.13-29.12 6.96-44.29 40.69-33.89 75.34 10.4 34.65 42.44 57.09 71.56 50.13 29.12-6.96 44.29-40.69 33.89-75.34zm84.72-20.78c30.94-8.14 46.42-49.94 34.58-93.36s-46.52-72.01-77.46-63.87-46.42 49.94-34.58 93.36c11.84 43.42 46.53 72.02 77.46 63.87zm281.39-29.34c-29.12-6.96-61.15 15.48-71.56 50.13-10.4 34.65 4.77 68.38 33.89 75.34 29.12 6.96 61.15-15.48 71.56-50.13 10.4-34.65-4.77-68.38-33.89-75.34zm-156.27 29.34c30.94 8.14 65.62-20.45 77.46-63.87 11.84-43.42-3.64-85.21-34.58-93.36s-65.62 20.45-77.46 63.87c-11.84 43.42 3.64 85.22 34.58 93.36z"/>
+                    </svg>
                   </div>
                 )}
               </div>
@@ -352,21 +425,21 @@ export const Settings = () => {
                     file:mr-4 file:py-2 file:px-4
                     file:rounded-lg file:border-0
                     file:text-sm file:font-semibold
-                    file:bg-lightblue file:text-charcoal
+                    file:bg-petflix-orange file:text-white
                     dark:file:bg-petflix-orange dark:file:text-white
-                    hover:file:bg-lightblue/80 dark:hover:file:bg-petflix-red
+                    hover:file:bg-petflix-orange/80 dark:hover:file:bg-petflix-red
                     file:cursor-pointer
                     cursor-pointer"
                   disabled={uploadingPicture}
                 />
                 {profilePictureFile && (
-                  <button
+                  <Button
                     onClick={handleUploadProfilePicture}
                     disabled={uploadingPicture}
-                    className="mt-2 px-4 py-2 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="mt-2 px-4 py-2 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-white dark:text-white font-medium"
                   >
                     {uploadingPicture ? 'Uploading...' : 'Upload Picture'}
-                  </button>
+                  </Button>
                 )}
               </div>
 
@@ -376,12 +449,12 @@ export const Settings = () => {
                   Or enter a URL instead
                 </summary>
                 <div className="mt-2">
-                  <input
+                  <Input
                     type="url"
                     value={profilePictureUrl}
                     onChange={(e) => setProfilePictureUrl(e.target.value)}
                     placeholder="https://example.com/your-profile-pic.jpg"
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-petflix-dark-gray text-charcoal dark:text-white border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
                   />
                 </div>
               </details>
@@ -391,13 +464,13 @@ export const Settings = () => {
               </p>
             </div>
 
-            <button
+            <Button
               onClick={handleSaveProfile}
               disabled={savingProfile}
-              className="w-full px-6 py-3 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-6 py-3 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-white dark:text-white font-bold"
             >
               {savingProfile ? 'Saving...' : 'Save Profile Changes'}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -412,25 +485,25 @@ export const Settings = () => {
               <label className="block text-sm font-semibold text-charcoal dark:text-white mb-2">
                 Email Address
               </label>
-              <input
+              <Input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your.email@example.com"
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-petflix-dark-gray text-charcoal dark:text-white border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
               />
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                ⚠️ You can only change your email once every 7 days
+                Your email address will be updated immediately
               </p>
             </div>
 
-            <button
+            <Button
               onClick={handleSaveEmail}
               disabled={savingEmail}
-              className="w-full px-6 py-3 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-6 py-3 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-white dark:text-white font-bold"
             >
               {savingEmail ? 'Saving...' : 'Update Email'}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -445,11 +518,11 @@ export const Settings = () => {
               <label className="block text-sm font-medium text-charcoal dark:text-white mb-2">
                 Current Password
               </label>
-              <input
+              <Input
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-petflix-dark-gray text-charcoal dark:text-white focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange focus:outline-none"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-petflix-dark-gray text-charcoal dark:text-white focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
                 placeholder="Enter current password"
               />
             </div>
@@ -458,11 +531,11 @@ export const Settings = () => {
               <label className="block text-sm font-medium text-charcoal dark:text-white mb-2">
                 New Password
               </label>
-              <input
+              <Input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-petflix-dark-gray text-charcoal dark:text-white focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange focus:outline-none"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-petflix-dark-gray text-charcoal dark:text-white focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
                 placeholder="Enter new password (min. 8 characters)"
               />
             </div>
@@ -471,22 +544,22 @@ export const Settings = () => {
               <label className="block text-sm font-medium text-charcoal dark:text-white mb-2">
                 Confirm New Password
               </label>
-              <input
+              <Input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-petflix-dark-gray text-charcoal dark:text-white focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange focus:outline-none"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-petflix-dark-gray text-charcoal dark:text-white focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
                 placeholder="Confirm new password"
               />
             </div>
 
-            <button
+            <Button
               onClick={handleChangePassword}
               disabled={changingPassword}
-              className="w-full px-6 py-3 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-6 py-3 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-white dark:text-white font-bold"
             >
               {changingPassword ? 'Changing Password...' : 'Change Password'}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -615,16 +688,17 @@ export const Settings = () => {
                   Sign out of your account on this device
                 </p>
               </div>
-              <button
+              <Button
                 onClick={() => {
                   logout();
                   navigate('/');
                   toast.success('Signed out successfully');
                 }}
-                className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition"
+                variant="destructive"
+                className="px-6 py-2"
               >
                 Sign Out
-              </button>
+              </Button>
             </div>
 
             <div className="border-t border-red-200 dark:border-red-800 pt-4">
@@ -637,12 +711,13 @@ export const Settings = () => {
                     Permanently delete your account and all data
                   </p>
                 </div>
-                <button
+                <Button
                   onClick={() => setShowDeleteModal(true)}
-                  className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition"
+                  variant="destructive"
+                  className="px-6 py-2"
                 >
                   Delete Account
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -650,69 +725,65 @@ export const Settings = () => {
       </div>
 
       {/* Delete Account Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 px-4">
-          <div className="bg-white dark:bg-petflix-dark rounded-lg p-8 max-w-md w-full border border-red-300 dark:border-red-700">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">
-                ⚠️ Delete Account
-              </h2>
-              <button
-                onClick={() => {
-                  setShowDeleteModal(false);
-                  setDeleteConfirmText('');
-                }}
-                className="text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-white text-2xl"
-              >
-                ✕
-              </button>
-            </div>
+      <Dialog open={showDeleteModal} onOpenChange={(open) => {
+        if (!open) {
+          setShowDeleteModal(false);
+          setDeleteConfirmText('');
+        }
+      }}>
+        <DialogContent className="max-w-md border-red-300 dark:border-red-700">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-red-600 dark:text-red-400">
+              ⚠️ Delete Account
+            </DialogTitle>
+          </DialogHeader>
 
-            <div className="mb-6">
-              <p className="text-charcoal dark:text-gray-300 mb-4">
-                This action is <strong>permanent and irreversible</strong>. All your data will be deleted, including:
-              </p>
-              <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-400 space-y-1 mb-4">
-                <li>Your profile and account information</li>
-                <li>All videos you've shared</li>
-                <li>All comments and playlists</li>
-                <li>Your followers and following lists</li>
-              </ul>
-              <p className="text-red-600 dark:text-red-400 font-semibold">
-                Type <span className="bg-red-100 dark:bg-red-900 px-2 py-1 rounded">DELETE</span> to confirm:
-              </p>
-            </div>
-
-            <input
-              type="text"
-              value={deleteConfirmText}
-              onChange={(e) => setDeleteConfirmText(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-red-300 dark:border-red-700 rounded-lg bg-white dark:bg-petflix-gray text-charcoal dark:text-white focus:ring-2 focus:ring-red-500 focus:outline-none mb-6"
-              placeholder="Type DELETE to confirm"
-            />
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowDeleteModal(false);
-                  setDeleteConfirmText('');
-                }}
-                className="flex-1 px-4 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium rounded-lg transition"
-                disabled={deletingAccount}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteAccount}
-                disabled={deletingAccount || deleteConfirmText !== 'DELETE'}
-                className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {deletingAccount ? 'Deleting...' : 'Delete Account'}
-              </button>
-            </div>
+          <div className="mb-6">
+            <p className="text-charcoal dark:text-gray-300 mb-4">
+              This action is <strong>permanent and irreversible</strong>. All your data will be deleted, including:
+            </p>
+            <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-400 space-y-1 mb-4">
+              <li>Your profile and account information</li>
+              <li>All videos you've shared</li>
+              <li>All comments and playlists</li>
+              <li>Your followers and following lists</li>
+            </ul>
+            <p className="text-red-600 dark:text-red-400 font-semibold">
+              Type <span className="bg-red-100 dark:bg-red-900 px-2 py-1 rounded">DELETE</span> to confirm:
+            </p>
           </div>
-        </div>
-      )}
+
+          <Input
+            type="text"
+            value={deleteConfirmText}
+            onChange={(e) => setDeleteConfirmText(e.target.value)}
+            className="w-full px-4 py-3 border-2 border-red-300 dark:border-red-700 bg-white dark:bg-petflix-gray text-charcoal dark:text-white focus:ring-2 focus:ring-red-500 mb-6"
+            placeholder="Type DELETE to confirm"
+          />
+
+          <div className="flex gap-3">
+            <Button
+              onClick={() => {
+                setShowDeleteModal(false);
+                setDeleteConfirmText('');
+              }}
+              variant="outline"
+              className="flex-1"
+              disabled={deletingAccount}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteAccount}
+              disabled={deletingAccount || deleteConfirmText !== 'DELETE'}
+              variant="destructive"
+              className="flex-1"
+            >
+              {deletingAccount ? 'Deleting...' : 'Delete Account'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -19,12 +19,19 @@ export const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current && 
+        !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -99,12 +106,49 @@ export const NotificationBell = () => {
     }
   };
 
+  const handleDelete = async (notificationId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    try {
+      await api.delete(`/push/notifications/${notificationId}`);
+      const updated = notifications.filter(n => n.id !== notificationId);
+      setNotifications(updated);
+      setUnreadCount(updated.filter(n => !n.read).length);
+    } catch (error) {
+      console.error('Failed to delete notification:', error);
+    }
+  };
+
+  const toggleDropdown = () => {
+    if (!isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const isMobile = window.innerWidth < 768;
+      
+      if (isMobile) {
+        // On mobile, position it with some padding from the edges
+        setDropdownPosition({
+          top: rect.bottom + 8,
+          right: 16 // 16px from right edge
+        });
+      } else {
+        // On desktop, align with the button
+        setDropdownPosition({
+          top: rect.bottom + 8,
+          right: window.innerWidth - rect.right
+        });
+      }
+    }
+    setIsOpen(!isOpen);
+  };
+
   if (!user) return null;
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        ref={buttonRef}
+        onClick={toggleDropdown}
         className="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
         aria-label="Notifications"
       >
@@ -129,7 +173,14 @@ export const NotificationBell = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-petflix-dark rounded-lg shadow-xl border border-gray-200 dark:border-transparent z-50 max-h-96 overflow-hidden flex flex-col">
+        <div 
+          ref={dropdownRef}
+          className="fixed w-[calc(100vw-32px)] max-w-sm md:max-w-md lg:w-[420px] bg-white dark:bg-petflix-dark rounded-lg shadow-xl border border-gray-200 dark:border-transparent z-50 max-h-96 overflow-hidden flex flex-col"
+          style={{
+            top: `${dropdownPosition.top}px`,
+            right: `${dropdownPosition.right}px`
+          }}
+        >
           <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <h3 className="font-bold text-charcoal dark:text-white">Notifications</h3>
             <div className="flex items-center gap-2">
@@ -143,7 +194,7 @@ export const NotificationBell = () => {
               {unreadCount > 0 && (
                 <button
                   onClick={handleMarkAllAsRead}
-                  className="text-sm text-lightblue dark:text-petflix-orange hover:underline"
+                  className="text-sm text-petflix-orange dark:text-petflix-orange hover:underline"
                 >
                   Mark all as read
                 </button>
@@ -160,41 +211,63 @@ export const NotificationBell = () => {
             ) : (
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
                 {notifications.map((notification) => (
-                  <Link
+                  <div
                     key={notification.id}
-                    to={notification.link || '/'}
-                    onClick={() => {
-                      handleMarkAsRead(notification.id);
-                      setIsOpen(false);
-                    }}
-                    className={`block p-4 hover:bg-gray-50 dark:hover:bg-petflix-gray transition ${
-                      !notification.read ? 'bg-blue-50 dark:bg-petflix-gray/50' : ''
+                    className={`group relative flex items-start gap-3 p-4 transition-colors ${
+                      !notification.read 
+                        ? 'bg-blue-50 dark:bg-petflix-gray/50 hover:bg-blue-100 dark:hover:bg-petflix-gray/70' 
+                        : 'hover:bg-gray-50 dark:hover:bg-petflix-gray/30'
                     }`}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className={`flex-shrink-0 w-2 h-2 rounded-full mt-2 ${
-                        !notification.read ? 'bg-lightblue dark:bg-petflix-orange' : 'bg-transparent'
-                      }`} />
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-semibold ${!notification.read ? 'text-charcoal dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>
-                          {notification.title}
-                        </p>
-                        <p className={`text-sm ${!notification.read ? 'font-medium text-charcoal dark:text-white' : 'text-gray-600 dark:text-gray-400'}`}>
-                          {notification.body}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                          {formatRelativeTime(notification.created_at)}
-                        </p>
-                      </div>
-                    </div>
-                  </Link>
+                    <div className={`flex-shrink-0 w-2 h-2 rounded-full mt-2 ${
+                      !notification.read ? 'bg-petflix-orange dark:bg-petflix-orange' : 'bg-transparent'
+                    }`} />
+                    <Link
+                      to={notification.link || '/'}
+                      onClick={() => {
+                        handleMarkAsRead(notification.id);
+                        setIsOpen(false);
+                      }}
+                      className="flex-1 min-w-0"
+                    >
+                      <p className={`text-sm font-semibold ${!notification.read ? 'text-charcoal dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>
+                        {notification.title}
+                      </p>
+                      <p className={`text-sm mt-1 ${!notification.read ? 'font-medium text-charcoal dark:text-white' : 'text-gray-600 dark:text-gray-400'}`}>
+                        {notification.body}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                        {formatRelativeTime(notification.created_at)}
+                      </p>
+                    </Link>
+                    <button
+                      onClick={(e) => handleDelete(notification.id, e)}
+                      className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-1.5 rounded-md hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-200"
+                      aria-label="Delete notification"
+                      title="Delete notification"
+                    >
+                      <svg
+                        className="w-4 h-4 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 ))}
               </div>
             )}
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

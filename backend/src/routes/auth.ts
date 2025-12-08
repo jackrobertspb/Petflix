@@ -66,7 +66,7 @@ router.post('/register', validateRegistration, async (req: Request, res: Respons
         email,
         password_hash: passwordHash
       })
-      .select('id, username, email, created_at')
+      .select('id, username, email, user_number, created_at')
       .single();
 
     if (insertError || !newUser) {
@@ -103,6 +103,7 @@ router.post('/register', validateRegistration, async (req: Request, res: Respons
         id: newUser.id,
         username: newUser.username,
         email: newUser.email,
+        user_number: newUser.user_number,
         created_at: newUser.created_at
       }
     });
@@ -135,7 +136,7 @@ router.post('/login', validateLogin, async (req: Request, res: Response): Promis
     // Find user by email (include locking fields)
     const { data: user, error: fetchError } = await supabase
       .from('users')
-      .select('id, username, email, password_hash, created_at, failed_login_attempts, locked_until')
+      .select('id, username, email, password_hash, user_number, created_at, failed_login_attempts, locked_until')
       .eq('email', email)
       .single();
 
@@ -258,6 +259,7 @@ router.post('/login', validateLogin, async (req: Request, res: Response): Promis
         id: user.id,
         username: user.username,
         email: user.email,
+        user_number: user.user_number,
         created_at: user.created_at
       }
     });
@@ -531,6 +533,13 @@ router.post('/verify-email', async (req: Request, res: Response): Promise<void> 
       return;
     }
 
+    // Get updated user data
+    const { data: updatedUser, error: _userError } = await supabase
+      .from('users')
+      .select('id, username, email, profile_picture_url, bio, user_number')
+      .eq('id', verificationToken.user_id)
+      .single();
+
     // Mark token as used
     await supabase
       .from('email_verification_tokens')
@@ -538,7 +547,8 @@ router.post('/verify-email', async (req: Request, res: Response): Promise<void> 
       .eq('id', verificationToken.id);
 
     res.status(200).json({
-      message: 'Email address has been verified and updated successfully.'
+      message: 'Email address has been verified and updated successfully.',
+      user: updatedUser
     });
   } catch (error) {
     console.error('Verify email error:', error);

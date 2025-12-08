@@ -21,7 +21,7 @@ module.exports = {
         'petflix-gray': '#808080',
         'petflix-light-gray': '#B3B3B3',
         'petflix-red': '#E50914',
-        'petflix-orange': '#FF6B35',
+        'petflix-orange': '#E50914',
         
         // Light Theme Colors
         'cream-light': '#FFFFFF', // White background

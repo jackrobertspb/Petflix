@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -72,22 +74,22 @@ export const Login = () => {
 
         <form onSubmit={handleSubmit} noValidate className="space-y-5">
           <div>
-            <input
+            <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-5 py-4 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+              className="w-full px-5 py-4 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
               placeholder="Email"
               required
             />
           </div>
 
           <div className="relative flex items-center">
-            <input
+            <Input
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-5 py-4 pr-12 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white rounded placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+              className="w-full px-5 py-4 pr-12 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
               placeholder="Password"
               required
             />
@@ -95,7 +97,7 @@ export const Login = () => {
               type="button"
               onClick={() => password && setShowPassword(!showPassword)}
               disabled={!password}
-              className="absolute right-4 text-gray-500 dark:text-gray-400 hover:text-charcoal dark:hover:text-white transition disabled:opacity-30 disabled:cursor-not-allowed"
+              className="absolute right-4 text-gray-500 dark:text-gray-400 hover:text-charcoal dark:hover:text-white disabled:opacity-30 transition-colors"
               aria-label="Toggle password visibility"
             >
               {showPassword ? (
@@ -120,13 +122,13 @@ export const Login = () => {
             </Link>
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold py-4 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-white dark:text-white font-bold py-4"
           >
             {loading ? 'Signing In...' : 'Sign In'}
-          </button>
+          </Button>
         </form>
 
         <div className="mt-8 text-center">

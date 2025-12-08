@@ -12,10 +12,10 @@ interface EmptyStateProps {
 
 export const EmptyState = memo(({ icon, title, description, actionText, actionLink, onAction }: EmptyStateProps) => {
   return (
-    <div className="text-center py-20 bg-petflix-dark-gray rounded-lg p-12 max-w-2xl mx-auto">
+    <div className="text-center py-20 bg-white dark:bg-petflix-dark-gray rounded-lg p-12 max-w-2xl mx-auto border border-gray-200 dark:border-transparent">
       <div className="text-6xl mb-6">{icon}</div>
-      <h2 className="text-3xl font-bold text-white mb-4">{title}</h2>
-      <p className="text-gray-400 text-lg mb-8">{description}</p>
+      <h2 className="text-3xl font-bold text-charcoal dark:text-white mb-4">{title}</h2>
+      <p className="text-gray-600 dark:text-gray-400 text-lg mb-8">{description}</p>
       
       {actionText && (actionLink || onAction) && (
         <>

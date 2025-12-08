@@ -16,6 +16,7 @@ export interface VideoWithRelevance {
   youtube_video_id: string;
   title: string;
   description: string;
+  thumbnail_url: string;
   created_at: string;
   view_count: number;
   relevanceScore: number;

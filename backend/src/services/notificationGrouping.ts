@@ -2,7 +2,7 @@
 // Groups multiple notifications together to reduce spam
 
 import { supabase } from '../config/supabase.js';
-import { sendNotificationToUser, PushNotificationPayload } from './push.js';
+import { sendNotificationToUser } from './push.js';
 
 interface QueuedNotification {
   id: string;
@@ -30,6 +30,59 @@ export async function queueNotification(
   data: any
 ): Promise<void> {
   try {
+    // Check for duplicate unsent notifications before inserting
+    // For video_like: prevent duplicate notifications if user likes, unlikes, then relikes
+    if (type === 'video_like' && data.videoId) {
+      // Check for unsent notification in queue
+      const { data: existingQueuedNotification } = await supabase
+        .from('notification_queue')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('notification_type', 'video_like')
+        .eq('notification_data->>videoId', data.videoId)
+        .is('sent_at', null)
+        .maybeSingle();
+
+      if (existingQueuedNotification) {
+        console.log(`🔔 [QUEUE] Skipping duplicate video_like notification for video ${data.videoId} (user ${userId}) - already in queue`);
+        return; // Don't create duplicate notification
+      }
+
+      // Also check for recent notification in notifications table (within last 5 minutes)
+      // This prevents duplicates even if the first notification was already sent
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      const { data: recentNotification } = await supabase
+        .from('notifications')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('type', 'video_like')
+        .like('link', `%/video/${data.videoId}%`)
+        .gte('created_at', fiveMinutesAgo)
+        .maybeSingle();
+
+      if (recentNotification) {
+        console.log(`🔔 [QUEUE] Skipping duplicate video_like notification for video ${data.videoId} (user ${userId}) - recent notification exists`);
+        return; // Don't create duplicate notification
+      }
+    }
+
+    // For comments: prevent duplicate notifications for same comment
+    if (type === 'comment' && data.commentId) {
+      const { data: existingNotification } = await supabase
+        .from('notification_queue')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('notification_type', 'comment')
+        .eq('notification_data->>commentId', data.commentId)
+        .is('sent_at', null)
+        .maybeSingle();
+
+      if (existingNotification) {
+        console.log(`🔔 [QUEUE] Skipping duplicate comment notification for comment ${data.commentId} (user ${userId})`);
+        return; // Don't create duplicate notification
+      }
+    }
+
     const { error } = await supabase
       .from('notification_queue')
       .insert({
@@ -187,20 +240,20 @@ function groupNotifications(notifications: QueuedNotification[]): Array<{
  */
 export async function processNotificationQueue(): Promise<void> {
   try {
-    const cutoffTime = new Date(Date.now() - GROUPING_WINDOW_MS).toISOString();
-    const now = Date.now();
-    // console.log(`🔔 [GROUPING] Processing queue (cutoff: ${cutoffTime}, window: ${GROUPING_WINDOW_MS}ms, now: ${new Date(now).toISOString()})`);
+    // const _cutoffTime = new Date(Date.now() - GROUPING_WINDOW_MS).toISOString();
+    // const now = Date.now();
+    // console.log(`🔔 [GROUPING] Processing queue (cutoff: ${_cutoffTime}, window: ${GROUPING_WINDOW_MS}ms, now: ${new Date(now).toISOString()})`);
     
     // First, check ALL unsent notifications (for debugging)
-    const { data: allUnsent, error: allError } = await supabase
+    const { data: allUnsent, error: _allError } = await supabase
       .from('notification_queue')
       .select('*')
       .is('sent_at', null);
     
     if (allUnsent && allUnsent.length > 0) {
-      const oldest = allUnsent.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())[0];
-      const oldestAge = now - new Date(oldest.created_at).getTime();
-      // console.log(`🔔 [GROUPING] DEBUG: Found ${allUnsent.length} total unsent notifications. Oldest is ${Math.floor(oldestAge / 1000)}s old`);
+      // const oldest = allUnsent.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())[0];
+      // const _oldestAge = now - new Date(oldest.created_at).getTime();
+      // console.log(`🔔 [GROUPING] DEBUG: Found ${allUnsent.length} total unsent notifications. Oldest is ${Math.floor(_oldestAge / 1000)}s old`);
     }
     
     // Get all unsent notifications (don't use cutoff - we want to process all unsent, even if older)
@@ -257,8 +310,8 @@ export async function processNotificationQueue(): Promise<void> {
       if (readyToSend.length === 0) {
         const oldest = userNotifications[0];
         if (oldest) {
-          const age = Date.now() - new Date(oldest.created_at).getTime();
-          // console.log(`🔔 [GROUPING] ⏳ Waiting for notifications to age (oldest: ${Math.floor(age / 1000)}s / ${GROUPING_WINDOW_MS / 1000}s)`);
+          // const _age = Date.now() - new Date(oldest.created_at).getTime();
+          // console.log(`🔔 [GROUPING] ⏳ Waiting for notifications to age (oldest: ${Math.floor(_age / 1000)}s / ${GROUPING_WINDOW_MS / 1000}s)`);
         }
         continue; // Wait for grouping window
       }

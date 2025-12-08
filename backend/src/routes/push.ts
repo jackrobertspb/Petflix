@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { supabase } from '../config/supabase.js';
 import { authenticateToken } from '../middleware/auth.js';
-import { queueNotification } from '../services/notificationGrouping.js';
+// import { queueNotification } from '../services/notificationGrouping.js';
 
 const router = Router();
 
@@ -139,97 +139,6 @@ router.delete('/unsubscribe-all', authenticateToken, async (req: Request, res: R
   }
 });
 
-// POST /api/v1/push/test-notifications - Test notification grouping (development only)
-router.post('/test-notifications', authenticateToken, async (req: Request, res: Response): Promise<void> => {
-  try {
-    if (process.env.NODE_ENV === 'production') {
-      res.status(403).json({ error: 'Test endpoint not available in production' });
-      return;
-    }
-
-    const userId = req.userId!;
-
-    // Get a video owned by the user (or any video if they don't have one)
-    const { data: userVideos } = await supabase
-      .from('videos')
-      .select('id, title')
-      .eq('user_id', userId)
-      .limit(1);
-
-    let testVideoId: string;
-    let testVideoTitle: string;
-
-    if (userVideos && userVideos.length > 0) {
-      testVideoId = userVideos[0].id;
-      testVideoTitle = userVideos[0].title;
-    } else {
-      // Get any video if user doesn't have one
-      const { data: anyVideo } = await supabase
-        .from('videos')
-        .select('id, title')
-        .limit(1)
-        .single();
-      
-      if (!anyVideo) {
-        res.status(404).json({ error: 'No videos found to test with' });
-        return;
-      }
-      
-      testVideoId = anyVideo.id;
-      testVideoTitle = anyVideo.title;
-    }
-
-    console.log('🧪 [TEST] Queuing test notifications for user:', userId);
-
-    // Queue 5 likes
-    for (let i = 1; i <= 5; i++) {
-      await queueNotification(userId, 'video_like', {
-        username: `TestUser${i}`,
-        videoTitle: testVideoTitle,
-        videoId: testVideoId,
-      });
-      console.log(`🧪 [TEST] Queued like ${i}/5`);
-    }
-
-    // Queue 2 comments
-    for (let i = 1; i <= 2; i++) {
-      await queueNotification(userId, 'comment', {
-        username: `Commenter${i}`,
-        commentText: `This is test comment number ${i}`,
-        videoId: testVideoId,
-      });
-      console.log(`🧪 [TEST] Queued comment ${i}/2`);
-    }
-
-    // Queue 3 follows
-    for (let i = 1; i <= 3; i++) {
-      await queueNotification(userId, 'follow', {
-        username: `Follower${i}`,
-        followerId: `test-follower-${i}`,
-      });
-      console.log(`🧪 [TEST] Queued follow ${i}/3`);
-    }
-
-    console.log('🧪 [TEST] All notifications queued successfully');
-
-    res.status(200).json({
-      message: 'Test notifications queued successfully',
-      queued: {
-        likes: 5,
-        comments: 2,
-        follows: 3,
-      },
-      note: process.env.NODE_ENV === 'production' 
-        ? 'Notifications will be grouped and sent within 5 minutes'
-        : 'Notifications will be grouped and sent within 30 seconds',
-      userId: userId,
-    });
-  } catch (error) {
-    console.error('Test notifications error:', error);
-    res.status(500).json({ error: 'Internal server error', details: error instanceof Error ? error.message : String(error) });
-  }
-});
-
 // GET /api/v1/push/debug - Comprehensive debug endpoint (development only)
 router.get('/debug', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
@@ -307,7 +216,7 @@ router.get('/queue-status', authenticateToken, async (req: Request, res: Respons
     const userId = req.userId!;
 
     // Check if table exists
-    const { data: tableCheck, error: tableError } = await supabase
+    const { data: _tableCheck, error: tableError } = await supabase
       .from('notification_queue')
       .select('id')
       .limit(1);
@@ -392,7 +301,7 @@ router.get('/queue-status', authenticateToken, async (req: Request, res: Respons
 });
 
 // POST /api/v1/push/process-queue - Manually trigger queue processing (development only)
-router.post('/process-queue', authenticateToken, async (req: Request, res: Response): Promise<void> => {
+router.post('/process-queue', authenticateToken, async (_req: Request, res: Response): Promise<void> => {
   try {
     if (process.env.NODE_ENV === 'production') {
       res.status(403).json({ error: 'Debug endpoint not available in production' });
@@ -497,6 +406,31 @@ router.patch('/notifications/read-all', authenticateToken, async (req: Request, 
     res.status(200).json({ message: 'All notifications marked as read' });
   } catch (error) {
     console.error('Mark all notifications as read error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// DELETE /api/v1/push/notifications/:notificationId - Delete a notification
+router.delete('/notifications/:notificationId', authenticateToken, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.userId!;
+    const { notificationId } = req.params;
+
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', notificationId)
+      .eq('user_id', userId); // Ensure user can only delete their own notifications
+
+    if (error) {
+      console.error('Error deleting notification:', error);
+      res.status(500).json({ error: 'Failed to delete notification' });
+      return;
+    }
+
+    res.status(200).json({ message: 'Notification deleted successfully' });
+  } catch (error) {
+    console.error('Delete notification error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

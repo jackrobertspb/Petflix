@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 
 export const ShareVideo = () => {
   const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -96,10 +99,13 @@ export const ShareVideo = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-24 px-8 md:px-16 pb-12">
+    <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-20 sm:pt-24 px-4 sm:px-6 md:px-8 lg:px-16 pb-8 sm:pb-12">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold text-charcoal dark:text-white mb-2">
-          Share a Pet Video 🎬
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-charcoal dark:text-white mb-2 flex items-center gap-3">
+          <svg className="w-8 h-8 sm:w-10 sm:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          Share a Pet Video
         </h1>
         <p className="text-gray-700 dark:text-gray-400 mb-8">
           Share your favorite pet videos from YouTube with the Petflix community
@@ -107,7 +113,12 @@ export const ShareVideo = () => {
 
         {error && (
           <div className="bg-red-600/90 text-white px-6 py-4 rounded-lg mb-6">
-            <p className="font-bold mb-2">❌ Error sharing video:</p>
+            <p className="font-bold mb-2 flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Error sharing video:
+            </p>
             <p className="text-sm mb-3">{error}</p>
             {existingVideoId && (
               <button
@@ -127,24 +138,24 @@ export const ShareVideo = () => {
               YouTube URL <span className="text-red-600 dark:text-petflix-orange">*</span>
             </label>
             <div className="flex gap-3">
-              <input
+              <Input
                 type="text"
                 value={youtubeUrl}
                 onChange={(e) => {
                   setYoutubeUrl(e.target.value);
                   setPreview(null);
                 }}
-                className="flex-1 px-5 py-3 bg-white dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-gray-600 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+                className="flex-1 px-5 py-3 bg-white dark:bg-petflix-dark-gray text-charcoal dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-gray-600 dark:border-gray-700 focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
                 placeholder="youtube.com/watch?v=... or youtu.be/... (https:// optional)"
                 required
               />
-              <button
+              <Button
                 type="button"
                 onClick={handlePreview}
-                className="px-6 py-3 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white font-medium rounded transition"
+                className="px-6 py-3 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-gray dark:hover:bg-petflix-orange text-white dark:text-white font-medium"
               >
                 Preview
-              </button>
+              </Button>
             </div>
             <p className="text-sm text-gray-700 dark:text-gray-400 mt-2">
               Paste a YouTube video link (e.g., youtube.com/watch?v=dQw4w9WgXcQ)
@@ -177,11 +188,11 @@ export const ShareVideo = () => {
             <label className="block text-charcoal dark:text-white font-bold mb-3">
               Custom Title <span className="text-gray-600 dark:text-gray-400 font-normal">(Optional)</span>
             </label>
-            <input
+            <Input
               type="text"
               value={customTitle}
               onChange={(e) => setCustomTitle(e.target.value)}
-              className="w-full px-5 py-3 bg-white dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-gray-600 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+              className="w-full px-5 py-3 bg-white dark:bg-petflix-dark-gray text-charcoal dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-gray-600 dark:border-gray-700 focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
               placeholder="Leave empty to use YouTube's title"
               maxLength={100}
             />
@@ -195,10 +206,10 @@ export const ShareVideo = () => {
             <label className="block text-charcoal dark:text-white font-bold mb-3">
               Custom Description <span className="text-gray-600 dark:text-gray-400 font-normal">(Optional)</span>
             </label>
-            <textarea
+            <Textarea
               value={customDescription}
               onChange={(e) => setCustomDescription(e.target.value)}
-              className="w-full px-5 py-3 bg-white dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-gray-600 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange resize-none"
+              className="w-full px-5 py-3 bg-white dark:bg-petflix-dark-gray text-charcoal dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-gray-600 dark:border-gray-700 focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange resize-none"
               placeholder="Add your own description or leave empty to use YouTube's"
               rows={4}
               maxLength={500}
@@ -210,26 +221,41 @@ export const ShareVideo = () => {
 
           {/* Submit Button */}
           <div className="flex gap-4">
-            <button
+            <Button
               type="submit"
               disabled={loading || !youtubeUrl}
-              className="flex-1 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold py-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+              className="flex-1 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-white dark:text-white font-bold py-4 text-lg flex items-center justify-center gap-2"
             >
-              {loading ? 'Sharing Video...' : '🐾 Share with Petflix'}
-            </button>
-            <button
+              {loading ? (
+                'Sharing Video...'
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  Share with Petflix
+                </>
+              )}
+            </Button>
+            <Button
               type="button"
               onClick={() => navigate('/feed')}
-              className="px-8 py-4 bg-gray-300 hover:bg-gray-400 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium rounded-lg transition"
+              variant="outline"
+              className="px-8 py-4 bg-gray-300 hover:bg-gray-400 dark:bg-petflix-gray dark:hover:bg-opacity-80 text-charcoal dark:text-white font-medium"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
 
         {/* Tips */}
         <div className="mt-8 bg-gray-50 dark:bg-petflix-dark rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-          <h3 className="text-charcoal dark:text-white font-bold mb-3">💡 Tips for Sharing</h3>
+          <h3 className="text-charcoal dark:text-white font-bold mb-3 flex items-center gap-2">
+            <svg className="w-5 h-5 text-yellow-500 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            Tips for Sharing
+          </h3>
           <ul className="space-y-2 text-gray-700 dark:text-gray-400 text-sm">
             <li>• Find a cute pet video on YouTube</li>
             <li>• Copy the URL from your browser's address bar</li>

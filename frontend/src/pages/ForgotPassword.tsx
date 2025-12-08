@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { useToast } from '../contexts/ToastContext';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -49,24 +51,24 @@ export const ForgotPassword = () => {
                 <label htmlFor="email" className="block text-sm font-medium text-charcoal dark:text-white mb-2">
                   Email Address
                 </label>
-                <input
+                <Input
                   type="email"
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 dark:bg-petflix-dark-gray dark:border-gray-600 dark:text-white rounded-lg focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 dark:bg-petflix-dark-gray dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
                   placeholder="you@example.com"
                   required
                 />
               </div>
 
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-petflix-orange hover:bg-petflix-red text-white font-bold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-petflix-orange hover:bg-petflix-red text-white font-bold py-3"
               >
                 {loading ? 'Sending...' : 'Send Reset Link'}
-              </button>
+              </Button>
             </form>
 
             <div className="mt-6 text-center">

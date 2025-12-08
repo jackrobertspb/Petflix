@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
@@ -9,12 +9,19 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { OnboardingTutorial } from './components/OnboardingTutorial';
 
+// Redirect component for old playlist routes
+const PlaylistRedirect = () => {
+  const { playlistId } = useParams<{ playlistId: string }>();
+  return <Navigate to={`/playlists/${playlistId}`} replace />;
+};
+
 // Lazy load pages for better performance
 const Landing = lazy(() => import('./pages/Landing').then(m => ({ default: m.Landing })));
 const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })));
 const Register = lazy(() => import('./pages/Register').then(m => ({ default: m.Register })));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
 const ResetPassword = lazy(() => import('./pages/ResetPassword').then(m => ({ default: m.ResetPassword })));
+const VerifyEmailChange = lazy(() => import('./pages/VerifyEmailChange').then(m => ({ default: m.VerifyEmailChange })));
 const Search = lazy(() => import('./pages/Search').then(m => ({ default: m.Search })));
 const Feed = lazy(() => import('./pages/Feed').then(m => ({ default: m.Feed })));
 const VideoDetail = lazy(() => import('./pages/VideoDetail').then(m => ({ default: m.VideoDetail })));
@@ -23,11 +30,8 @@ const ShareVideo = lazy(() => import('./pages/ShareVideo').then(m => ({ default:
 const Playlists = lazy(() => import('./pages/Playlists').then(m => ({ default: m.Playlists })));
 const PlaylistDetail = lazy(() => import('./pages/PlaylistDetail').then(m => ({ default: m.PlaylistDetail })));
 const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
-const TestChecklist = lazy(() => import('./pages/TestChecklist').then(m => ({ default: m.TestChecklist })));
 const ShareRedirect = lazy(() => import('./pages/ShareRedirect').then(m => ({ default: m.ShareRedirect })));
 const RecentlyViewed = lazy(() => import('./pages/RecentlyViewed').then(m => ({ default: m.RecentlyViewed })));
-const AdminSettings = lazy(() => import('./pages/AdminSettings').then(m => ({ default: m.AdminSettings })));
-const AdminErrorDashboard = lazy(() => import('./pages/AdminErrorDashboard').then(m => ({ default: m.AdminErrorDashboard })));
 
 function App() {
   return (
@@ -36,7 +40,7 @@ function App() {
         <ThemeProvider>
           <AuthProvider>
             <ToastProvider>
-              <div className="min-h-screen bg-cream-light dark:bg-petflix-black transition-colors duration-200">
+              <div className="min-h-screen bg-cream-light dark:bg-petflix-black transition-colors duration-200 overflow-x-hidden w-full">
                 <Navbar />
                 <PWAInstallPrompt />
                 <OnboardingTutorial />
@@ -44,7 +48,7 @@ function App() {
                 fallback={
                   <div className="min-h-screen flex items-center justify-center bg-cream-light dark:bg-petflix-black">
                     <div className="text-center">
-                      <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-lightblue dark:border-petflix-orange border-t-transparent"></div>
+                      <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-petflix-orange dark:border-petflix-orange border-t-transparent"></div>
                       <p className="mt-4 text-charcoal dark:text-white">Loading...</p>
                     </div>
                   </div>
@@ -57,6 +61,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify-email" element={<VerifyEmailChange />} />
             <Route path="/search" element={<Search />} />
             <Route path="/s/:shareCode" element={<ShareRedirect />} />
 
@@ -109,6 +114,15 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            {/* Redirect old /playlist/:id to /playlists/:id */}
+            <Route
+              path="/playlist/:playlistId"
+              element={
+                <ProtectedRoute>
+                  <PlaylistRedirect />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/playlists/:playlistId"
               element={
@@ -122,30 +136,6 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Settings />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/test-checklist"
-              element={
-                <ProtectedRoute>
-                  <TestChecklist />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/settings"
-              element={
-                <ProtectedRoute>
-                  <AdminSettings />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/errors"
-              element={
-                <ProtectedRoute>
-                  <AdminErrorDashboard />
                 </ProtectedRoute>
               }
             />

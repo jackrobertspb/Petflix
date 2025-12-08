@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export const Register = () => {
   const [username, setUsername] = useState('');
@@ -63,7 +65,7 @@ export const Register = () => {
     <div className="min-h-screen bg-cream-light dark:bg-petflix-black flex items-center justify-center px-4 pt-20">
       <div className="max-w-md w-full bg-white dark:bg-petflix-dark rounded-lg p-16 backdrop-blur-sm shadow-xl border border-gray-200 dark:border-gray-700">
         <h1 className="text-4xl font-bold text-charcoal dark:text-white mb-8">
-          Join Petflix 🐾
+          Join Petflix
         </h1>
 
         {error && (
@@ -74,22 +76,22 @@ export const Register = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <input
+            <Input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-5 py-4 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+              className="w-full px-5 py-4 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
               placeholder="Username"
               required
             />
           </div>
 
           <div>
-            <input
+            <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-5 py-4 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+              className="w-full px-5 py-4 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
               placeholder="Email"
               required
             />
@@ -97,11 +99,11 @@ export const Register = () => {
 
           <div>
             <div className="relative flex items-center">
-              <input
+              <Input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-5 py-4 pr-12 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+                className="w-full px-5 py-4 pr-12 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
                 placeholder="Password"
                 required
               />
@@ -109,7 +111,7 @@ export const Register = () => {
                 type="button"
                 onClick={() => password && setShowPassword(!showPassword)}
                 disabled={!password}
-                className="absolute right-4 text-gray-500 dark:text-gray-400 hover:text-charcoal dark:hover:text-white transition disabled:opacity-30 disabled:cursor-not-allowed"
+                className="absolute right-4 text-gray-500 dark:text-gray-400 hover:text-charcoal dark:hover:text-white disabled:opacity-30 transition-colors"
                 aria-label="Toggle password visibility"
               >
                 {showPassword ? (
@@ -130,11 +132,11 @@ export const Register = () => {
           </div>
 
           <div className="relative flex items-center">
-            <input
+            <Input
               type={showConfirmPassword ? 'text' : 'password'}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-5 py-4 pr-12 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white rounded border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lightblue dark:focus:ring-petflix-orange"
+              className="w-full px-5 py-4 pr-12 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
               placeholder="Confirm Password"
               required
             />
@@ -142,7 +144,7 @@ export const Register = () => {
               type="button"
               onClick={() => confirmPassword && setShowConfirmPassword(!showConfirmPassword)}
               disabled={!confirmPassword}
-              className="absolute right-4 text-gray-400 hover:text-white transition disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-gray-400"
+              className="absolute right-4 text-gray-500 dark:text-gray-400 hover:text-charcoal dark:hover:text-white disabled:opacity-30 transition-colors"
               aria-label="Toggle confirm password visibility"
             >
               {showConfirmPassword ? (
@@ -158,13 +160,13 @@ export const Register = () => {
             </button>
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold py-4 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-white dark:text-white font-bold py-4"
           >
             {loading ? 'Creating Account...' : 'Sign Up'}
-          </button>
+          </Button>
         </form>
 
         <div className="mt-8 text-center">

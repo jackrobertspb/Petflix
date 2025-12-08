@@ -123,7 +123,7 @@ export const OnboardingTutorial = () => {
           </div>
           <div className="w-full bg-gray-200 dark:bg-petflix-gray rounded-full h-2">
             <div
-              className="bg-lightblue dark:bg-petflix-orange h-2 rounded-full transition-all duration-300"
+              className="bg-petflix-orange dark:bg-petflix-orange h-2 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -154,7 +154,7 @@ export const OnboardingTutorial = () => {
           </button>
           <button
             onClick={handleNext}
-            className="px-6 py-3 bg-lightblue hover:bg-lightblue/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded-lg transition"
+            className="px-6 py-3 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-charcoal dark:text-white font-bold rounded-lg transition"
           >
             {isLastStep ? 'Get Started!' : 'Next →'}
           </button>
@@ -167,7 +167,7 @@ export const OnboardingTutorial = () => {
               key={index}
               className={`w-2 h-2 rounded-full transition-all ${
                 index === currentStep
-                  ? 'bg-lightblue dark:bg-petflix-orange w-8'
+                  ? 'bg-petflix-orange dark:bg-petflix-orange w-8'
                   : 'bg-gray-300 dark:bg-petflix-gray'
               }`}
             />
