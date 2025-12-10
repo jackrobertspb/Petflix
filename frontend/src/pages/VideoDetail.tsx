@@ -43,6 +43,7 @@ interface Playlist {
 export const VideoDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [video, setVideo] = useState<Video | null>(null);
+  const [relatedVideos, setRelatedVideos] = useState<Video[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
@@ -111,6 +112,18 @@ export const VideoDetail = () => {
           };
         });
         setCommentLikes(likesMap);
+
+        // Fetch related videos (videos from the same user or random videos)
+        try {
+          const relatedRes = await api.get('/videos', { params: { limit: 10 } });
+          // Filter out current video and take first 8
+          const filtered = (relatedRes.data.videos || [])
+            .filter((v: Video) => v.id !== id)
+            .slice(0, 8);
+          setRelatedVideos(filtered);
+        } catch (error) {
+          console.error('Failed to fetch related videos:', error);
+        }
 
         // Track video as recently viewed (offline storage)
         if (videoRes.data) {
@@ -474,6 +487,9 @@ export const VideoDetail = () => {
     }
   };
 
+  // Alias for the like button
+  const handleToggleLike = () => handleVideoLike();
+
   const handleVideoLike = async () => {
     if (!user) {
       toast.warning('Please sign in to like videos');
@@ -734,27 +750,84 @@ export const VideoDetail = () => {
             {/* Video Info */}
             <div className="bg-white dark:bg-petflix-dark rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-transparent">
               <h1 
-                className={`text-xl sm:text-2xl md:text-3xl font-bold text-charcoal dark:text-white mb-3 sm:mb-4 cursor-pointer hover:text-petflix-orange transition break-all ${titleExpanded ? '' : 'line-clamp-3'}`}
+                className={`text-xl sm:text-2xl md:text-3xl font-bold text-charcoal dark:text-white mb-3 cursor-pointer hover:text-petflix-orange transition break-all ${titleExpanded ? '' : 'line-clamp-2'}`}
                 onClick={() => setTitleExpanded(!titleExpanded)}
                 title={titleExpanded ? "Click to collapse" : "Click to see full title"}
               >
                 {video.title}
               </h1>
+
+              {/* Stats Row - YouTube Style */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <span className="flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  {video.view_count?.toLocaleString() || 0} views
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                  {videoLikeCount.toLocaleString()} likes
+                </span>
+                <span>•</span>
+                <span>{formatRelativeTime(video.created_at)}</span>
+              </div>
+
+              {/* User Info */}
               {video.username && (
                 <Link
                   to={`/profile/${video.shared_by_user_id}`}
-                  className="inline-flex items-center gap-2 text-charcoal dark:text-gray-300 hover:text-petflix-orange transition mb-4"
+                  className="inline-flex items-center gap-3 text-charcoal dark:text-gray-300 hover:text-petflix-orange transition mb-4"
                 >
-                  <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-petflix-gray flex items-center justify-center text-charcoal dark:text-white font-bold">
-                    {video.username.charAt(0).toUpperCase()}
+                  <div className="w-10 h-10 rounded-full bg-[#e5e7eb] dark:bg-[#e5e7eb] flex items-center justify-center">
+                    <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 512 512">
+                      <path d="M256 224c-79.41 0-192 122.76-192 200.25 0 34.9 26.81 55.75 71.74 55.75 48.84 0 81.09-25.08 120.26-25.08 39.51 0 71.85 25.08 120.26 25.08 44.93 0 71.74-20.85 71.74-55.75C448 346.76 335.41 224 256 224zm-147.28-12.61c-10.4-34.65-42.44-57.09-71.56-50.13-29.12 6.96-44.29 40.69-33.89 75.34 10.4 34.65 42.44 57.09 71.56 50.13 29.12-6.96 44.29-40.69 33.89-75.34zm84.72-20.78c30.94-8.14 46.42-49.94 34.58-93.36s-46.52-72.01-77.46-63.87-46.42 49.94-34.58 93.36c11.84 43.42 46.53 72.02 77.46 63.87zm281.39-29.34c-29.12-6.96-61.15 15.48-71.56 50.13-10.4 34.65 4.77 68.38 33.89 75.34 29.12 6.96 61.15-15.48 71.56-50.13 10.4-34.65-4.77-68.38-33.89-75.34zm-156.27 29.34c30.94 8.14 65.62-20.45 77.46-63.87 11.84-43.42-3.64-85.21-34.58-93.36s-65.62 20.45-77.46 63.87c-11.84 43.42 3.64 85.22 34.58 93.36z"/>
+                    </svg>
                   </div>
-                  <span className="font-medium">@{video.username}</span>
+                  <div>
+                    <div className="font-semibold">@{video.username}</div>
+                  </div>
                 </Link>
               )}
+
+              {/* Like and Playlist Buttons */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={handleToggleLike}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium transition ${
+                    videoLiked
+                      ? 'bg-petflix-orange/10 text-petflix-orange dark:bg-petflix-orange/20'
+                      : 'bg-gray-200 dark:bg-[#272727] text-charcoal dark:text-white hover:bg-gray-300 dark:hover:bg-[#333333]'
+                  }`}
+                >
+                  <svg className="w-5 h-5" fill={videoLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  {videoLiked ? 'Liked' : 'Like'}
+                </button>
+
+                <button
+                  onClick={() => setShowPlaylistModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full font-medium bg-gray-200 dark:bg-[#272727] text-charcoal dark:text-white hover:bg-gray-300 dark:hover:bg-[#333333] transition"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Save
+                </button>
+              </div>
+
+              {/* Description */}
               {video.description && (
-                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words mt-4 leading-relaxed">
-                  {video.description}
-                </p>
+                <div className="mt-4 p-4 bg-gray-200 dark:bg-[#272727] rounded-lg">
+                  <p className="text-gray-800 dark:text-gray-300 whitespace-pre-wrap break-words leading-relaxed">
+                    {video.description}
+                  </p>
+                </div>
               )}
             </div>
 
@@ -774,7 +847,7 @@ export const VideoDetail = () => {
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
                       placeholder="Add a comment..."
-                      className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white focus:ring-2 focus:ring-petflix-orange resize-none placeholder-gray-500 dark:placeholder-gray-400 border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere"
+                      className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-gray text-charcoal dark:text-white focus:ring-2 focus:ring-petflix-orange resize-none placeholder-gray-400 dark:placeholder-gray-500 border border-gray-300 dark:border-transparent break-words overflow-wrap-anywhere"
                       rows={3}
                       maxLength={280}
                       style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
@@ -917,7 +990,7 @@ export const VideoDetail = () => {
                                         onClick={() => handleEditCommentClick(comment.id, comment.content)}
                                         variant="ghost"
                                         size="sm"
-                                        className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center gap-1"
+                                        className="text-sm text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 font-medium flex items-center gap-1"
                                       >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -1090,7 +1163,7 @@ export const VideoDetail = () => {
                                                   onClick={() => handleEditCommentClick(reply.id, reply.content)}
                                                   variant="ghost"
                                                   size="sm"
-                                                  className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center gap-1"
+                                                  className="text-xs text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 font-medium flex items-center gap-1"
                                                 >
                                                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -1128,58 +1201,60 @@ export const VideoDetail = () => {
             </div>
           </div>
 
-          {/* Sidebar Actions */}
+          {/* Sidebar - Related Videos */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-petflix-dark rounded-lg p-4 sm:p-6 sticky top-20 sm:top-24 border border-gray-200 dark:border-transparent">
-              {/* Stats Section */}
-              <div className="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="font-bold text-charcoal dark:text-white text-lg mb-4">Stats</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      Views
-                    </span>
-                    <span className="font-bold text-charcoal dark:text-white">
-                      {video.view_count?.toLocaleString() || 0}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                      </svg>
-                      Likes
-                    </span>
-                    <span className="font-bold text-charcoal dark:text-white">
-                      {videoLikeCount.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
-                      Comments
-                    </span>
-                    <span className="font-bold text-charcoal dark:text-white">
-                      {comments.length.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
+            <div className="sticky top-20 sm:top-24 space-y-4">
+              <h3 className="font-bold text-charcoal dark:text-white text-lg px-2">Related Videos</h3>
+              
+              <div className="space-y-3">
+                {relatedVideos.length > 0 ? (
+                  relatedVideos.map((relatedVideo) => (
+                    <Link
+                      key={relatedVideo.id}
+                      to={`/video/${relatedVideo.id}`}
+                      className="flex gap-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-petflix-dark-gray/50 transition"
+                    >
+                      {/* Thumbnail */}
+                      <div className="w-40 flex-shrink-0">
+                        <div className="relative w-full pb-[56.25%] bg-gray-200 dark:bg-petflix-dark-gray rounded overflow-hidden">
+                          <img
+                            src={`https://img.youtube.com/vi/${relatedVideo.youtube_video_id}/mqdefault.jpg`}
+                            alt={relatedVideo.title}
+                            className="absolute inset-0 w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-semibold text-charcoal dark:text-white line-clamp-2 mb-1">
+                          {relatedVideo.title}
+                        </h4>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          {relatedVideo.username ? `@${relatedVideo.username}` : 'Unknown'}
+                        </p>
+                        <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-500 mt-1">
+                          <span>{relatedVideo.view_count?.toLocaleString() || 0} views</span>
+                          <span>•</span>
+                          <span>{formatRelativeTime(relatedVideo.created_at)}</span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-600 dark:text-gray-400 px-2">No related videos found.</p>
+                )}
               </div>
 
-              <h3 className="font-bold text-charcoal dark:text-white text-lg mb-4">Actions</h3>
-              <div className="space-y-3">
-                {/* Owner-only actions */}
-                {user && user.id === video?.shared_by_user_id && (
-                  <>
+              {/* Owner Actions Below Related Videos */}
+              {user && user.id === video?.shared_by_user_id && (
+                <div className="bg-white dark:bg-petflix-dark rounded-lg p-4 border border-gray-200 dark:border-transparent mt-6">
+                  <h3 className="font-bold text-charcoal dark:text-white text-sm mb-3">Manage Video</h3>
+                  <div className="space-y-2">
                     <button 
                       onClick={handleOpenEditModal}
-                      className="w-full px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
+                      className="w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition flex items-center justify-center gap-2"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -1188,75 +1263,27 @@ export const VideoDetail = () => {
                     </button>
                     <button 
                       onClick={handleDeleteVideoClick}
-                      className="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
+                      className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition flex items-center justify-center gap-2"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                       Delete Video
                     </button>
-                    <div className="border-t border-gray-300 dark:border-gray-600 my-3"></div>
-                  </>
-                )}
+                  </div>
+                </div>
+              )}
 
-                <Button 
-                  onClick={handleVideoLike}
-                  disabled={videoLikeLoading}
-                  variant={videoLiked ? 'default' : 'outline'}
-                  className={`w-full px-4 py-3 font-medium flex items-center justify-center gap-2 ${
-                    videoLiked 
-                      ? 'bg-petflix-orange hover:bg-petflix-red text-white' 
-                      : 'bg-gray-200 hover:bg-petflix-orange dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white'
-                  }`}
-                >
-                  {videoLikeLoading ? (
-                    <div className="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                  ) : videoLiked ? (
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
-                  ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  )}
-                  {videoLiked ? 'Liked' : 'Like'} ({videoLikeCount})
-                </Button>
-                <Button 
-                  onClick={handleOpenPlaylistModal}
-                  variant="outline"
-                  className="w-full px-4 py-3 bg-gray-200 hover:bg-petflix-orange dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white font-medium flex items-center justify-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Add to Playlist
-                </Button>
-                <Button 
-                  onClick={handleOpenShareModal}
-                  variant="outline"
-                  className="w-full px-4 py-3 bg-gray-200 hover:bg-petflix-orange dark:bg-petflix-gray dark:hover:bg-petflix-orange text-charcoal dark:text-white font-medium flex items-center justify-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                  </svg>
-                  Share
-                </Button>
-                
-                {/* Only show report button if NOT owner */}
-                {(!user || user.id !== video?.shared_by_user_id) && (
-                  <Button 
-                    onClick={handleOpenReportModal}
-                    variant="outline"
-                    className="w-full px-4 py-3 bg-gray-200 hover:bg-red-500 dark:bg-petflix-gray dark:hover:bg-red-600 text-charcoal dark:text-white font-medium flex items-center justify-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    Report Video
-                  </Button>
-                )}
-              </div>
+              {/* Share Button */}
+              <button 
+                onClick={handleOpenShareModal}
+                className="w-full px-4 py-2 mt-4 bg-gray-100 hover:bg-gray-200 dark:bg-petflix-gray dark:hover:bg-petflix-dark-gray text-charcoal dark:text-white text-sm font-medium rounded-lg transition flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                Share
+              </button>
             </div>
           </div>
         </div>
@@ -1636,7 +1663,7 @@ export const VideoDetail = () => {
               <Button
                 type="submit"
                 disabled={savingEdit || !editTitle.trim()}
-                className="flex-1 bg-blue-500 hover:bg-blue-600"
+                className="flex-1 bg-gray-700 hover:bg-gray-600"
               >
                 {savingEdit ? 'Saving...' : 'Save Changes'}
               </Button>

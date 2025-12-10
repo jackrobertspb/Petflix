@@ -17,6 +17,7 @@ interface Playlist {
   user_id: string;
   created_at: string;
   video_count?: number;
+  latest_video_thumbnail?: string;
 }
 
 export const Playlists = () => {
@@ -156,29 +157,48 @@ export const Playlists = () => {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
             {playlists.map((playlist) => (
               <div
                 key={playlist.id}
-                className="bg-gray-50 dark:bg-petflix-dark rounded-lg p-6 hover:bg-gray-100 dark:hover:bg-petflix-dark-gray transition group border border-gray-200 dark:border-gray-700"
+                className="group"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <Link
-                      to={`/playlists/${playlist.id}`}
-                      className="text-xl font-bold text-charcoal dark:text-white hover:text-petflix-orange dark:hover:text-petflix-orange transition group-hover:underline"
-                    >
+                <Link to={`/playlists/${playlist.id}`} className="block">
+                  {/* Thumbnail with count overlay - YouTube style */}
+                  <div className="relative w-full pb-[56.25%] bg-gray-200 dark:bg-petflix-dark-gray rounded-lg overflow-hidden mb-3">
+                    {playlist.latest_video_thumbnail ? (
+                      <img
+                        src={playlist.latest_video_thumbnail}
+                        alt={playlist.name}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <svg className="w-12 h-12 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                      </div>
+                    )}
+                    
+                    {/* Video count overlay - bottom right */}
+                    <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs font-semibold px-2 py-1 rounded flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                      </svg>
+                      {playlist.video_count || 0}
+                    </div>
+                  </div>
+
+                  {/* Playlist info */}
+                  <div className="px-1">
+                    <h3 className="font-semibold text-charcoal dark:text-white text-sm line-clamp-2 group-hover:text-petflix-orange transition mb-1">
                       {playlist.name}
-                    </Link>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-sm text-gray-700 dark:text-gray-400">
-                        {playlist.video_count || 0} videos
-                      </span>
-                      <span className="text-gray-400 dark:text-gray-600">•</span>
-                      <span className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${
+                    </h3>
+                    <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                      <span className={`flex items-center gap-1 ${
                         playlist.visibility === 'public' 
-                          ? 'bg-green-600 text-white' 
-                          : 'bg-gray-500 dark:bg-gray-600 text-white'
+                          ? 'text-green-600 dark:text-green-400' 
+                          : 'text-gray-500 dark:text-gray-500'
                       }`}>
                         {playlist.visibility === 'public' ? (
                           <>
@@ -198,31 +218,22 @@ export const Playlists = () => {
                       </span>
                     </div>
                   </div>
+                </Link>
+
+                {/* Delete button - outside the link */}
+                <div className="px-1 mt-2">
                   <Button
                     onClick={() => handleDeletePlaylistClick(playlist.id)}
                     variant="ghost"
-                    size="icon"
-                    className="text-gray-500 dark:text-gray-400 hover:text-red-500 ml-2"
-                    title="Delete playlist"
+                    size="sm"
+                    className="w-full text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 flex items-center justify-center gap-1"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
+                    Delete
                   </Button>
                 </div>
-
-                {playlist.description && (
-                  <p className="text-gray-700 dark:text-gray-400 text-sm line-clamp-2 mb-4">
-                    {playlist.description}
-                  </p>
-                )}
-
-                <Link
-                  to={`/playlists/${playlist.id}`}
-                  className="inline-block text-sm text-petflix-orange dark:text-petflix-orange hover:underline"
-                >
-                  View Playlist →
-                </Link>
               </div>
             ))}
           </div>

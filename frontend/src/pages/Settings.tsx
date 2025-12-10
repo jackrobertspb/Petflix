@@ -23,6 +23,7 @@ export const Settings = () => {
   // Profile settings
   const [bio, setBio] = useState('');
   const [profilePictureUrl, setProfilePictureUrl] = useState('');
+  const [loadingData, setLoadingData] = useState(true);
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [profilePicturePreview, setProfilePicturePreview] = useState<string | null>(null);
   const [uploadingPicture, setUploadingPicture] = useState(false);
@@ -73,6 +74,7 @@ export const Settings = () => {
     if (!user) return;
     
     try {
+      setLoadingData(true);
       const response = await api.get(`/users/${user.id}`);
       const userData = response.data.user;
       setBio(userData.bio || '');
@@ -83,7 +85,9 @@ export const Settings = () => {
       setEmail(userData.email || '');
     } catch (error) {
       console.error('Failed to load user data:', error);
-      toast.error('Failed to load settings');
+      // Don't show error toast - settings will still work with cached data
+    } finally {
+      setLoadingData(false);
     }
   };
 
@@ -312,6 +316,33 @@ export const Settings = () => {
           <h1 className="text-2xl sm:text-3xl font-bold text-charcoal dark:text-white mb-4">
             Please sign in to view settings
           </h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadingData) {
+    return (
+      <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-20 sm:pt-24 px-4 sm:px-6 md:px-8 lg:px-16 pb-12 sm:pb-16">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-charcoal dark:text-white mb-6 sm:mb-8 flex items-center gap-3">
+            <svg className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Settings
+          </h1>
+          <div className="space-y-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-white dark:bg-petflix-dark rounded-lg p-6 border border-gray-200 dark:border-transparent">
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4 animate-pulse"></div>
+                <div className="space-y-3">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full animate-pulse"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-full animate-pulse"></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

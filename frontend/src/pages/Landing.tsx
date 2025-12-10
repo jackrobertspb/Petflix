@@ -79,16 +79,25 @@ export const Landing = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 w-full sm:w-auto">
-            {!user && (
-              <Button
-                asChild
-                className="w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 md:py-4 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-petflix-black font-bold text-sm sm:text-base md:text-lg shadow-md hover:shadow-lg border border-petflix-orange/30 dark:border-gray-300"
-              >
-                <Link to="/register">
-                  <span>▶</span> Get Started
-                </Link>
-              </Button>
-            )}
+            <Button
+              asChild
+              className="w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 md:py-4 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-orange/80 text-white dark:text-white font-bold text-sm sm:text-base md:text-lg shadow-md hover:shadow-lg border border-petflix-orange/30 dark:border-petflix-orange/30"
+            >
+              <Link to={user ? "/share" : "/register"} className="flex items-center gap-2">
+                {user ? (
+                  <>
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Share Videos
+                  </>
+                ) : (
+                  <>
+                    <span>▶</span> Get Started
+                  </>
+                )}
+              </Link>
+            </Button>
             <Button
               asChild
               variant="outline"

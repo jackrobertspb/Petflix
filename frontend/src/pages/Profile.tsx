@@ -36,6 +36,8 @@ interface Playlist {
   description: string | null;
   visibility: 'public' | 'private';
   created_at: string;
+  video_count?: number;
+  latest_video_thumbnail?: string;
 }
 
 export const Profile = () => {
@@ -46,6 +48,7 @@ export const Profile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followStats, setFollowStats] = useState<FollowStats>({ followersCount: 0, followingCount: 0 });
   const [loading, setLoading] = useState(true);
+  const [loadingPlaylists, setLoadingPlaylists] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user: currentUser } = useAuth();
@@ -75,7 +78,7 @@ export const Profile = () => {
             bio: currentUser.bio || null,
             created_at: new Date().toISOString()
           });
-          setLoading(false);
+          // Don't set loading to false yet - wait for all data to load
         }
 
         // Try to fetch user details from backend
@@ -118,10 +121,13 @@ export const Profile = () => {
 
         // Try to fetch playlists
         try {
+          setLoadingPlaylists(true);
           const playlistsRes = await api.get(`/playlists/user/${userId}`);
           setPlaylists(playlistsRes.data.playlists || []);
         } catch (err) {
           console.log('Could not load playlists');
+        } finally {
+          setLoadingPlaylists(false);
         }
 
         // Check if following (only if viewing another user's profile)
@@ -172,6 +178,7 @@ export const Profile = () => {
     }
   };
 
+
   if (loading) {
     return (
       <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-20 sm:pt-24 px-4 sm:px-6 md:px-8 lg:px-16">
@@ -181,24 +188,13 @@ export const Profile = () => {
           {/* Videos Section Skeleton */}
           <div className="mb-6 sm:mb-8">
             <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4 sm:mb-6"></div>
-            <VideoGridSkeleton count={12} />
+            <VideoGridSkeleton count={6} />
           </div>
 
           {/* Playlists Section Skeleton */}
           <div className="mb-16">
-            <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-6"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="bg-white dark:bg-petflix-dark rounded-lg p-6 border border-gray-200 dark:border-transparent">
-                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-3 animate-pulse"></div>
-                  <div className="space-y-2 mb-4">
-                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full animate-pulse"></div>
-                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse"></div>
-                  </div>
-                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-20 animate-pulse"></div>
-                </div>
-              ))}
-            </div>
+            <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4 sm:mb-6"></div>
+            <VideoGridSkeleton count={6} />
           </div>
         </div>
       </div>
@@ -401,7 +397,17 @@ export const Profile = () => {
             )}
           </div>
 
-          {playlists.length === 0 ? (
+          {loadingPlaylists ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="w-full pb-[56.25%] bg-gray-200 dark:bg-gray-700 rounded-lg mb-3"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          ) : playlists.length === 0 ? (
             <div className="bg-white dark:bg-petflix-dark rounded-lg p-12 text-center border border-gray-200 dark:border-transparent">
               <div className="flex justify-center mb-4">
                 <svg className="w-16 h-16 text-charcoal dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -421,36 +427,67 @@ export const Profile = () => {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
               {playlists.map((playlist) => (
                 <Link
                   key={playlist.id}
                   to={`/playlists/${playlist.id}`}
-                  className="bg-white dark:bg-petflix-dark rounded-lg p-6 hover:bg-gray-50 dark:hover:bg-petflix-gray transition cursor-pointer border border-gray-200 dark:border-transparent"
+                  className="block group"
                 >
-                  <h3 className="font-bold text-charcoal dark:text-white text-xl mb-2">
-                    {playlist.name}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
-                    {playlist.description || 'No description'}
-                  </p>
-                  <span className="text-xs bg-petflix-orange dark:bg-petflix-orange text-white dark:text-white px-3 py-1 rounded-full flex items-center gap-1">
-                    {playlist.visibility === 'public' ? (
-                      <>
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" />
-                        </svg>
-                        Public
-                      </>
+                  {/* Thumbnail with count overlay - YouTube style */}
+                  <div className="relative w-full pb-[56.25%] bg-gray-200 dark:bg-petflix-dark-gray rounded-lg overflow-hidden mb-3">
+                    {playlist.latest_video_thumbnail ? (
+                      <img
+                        src={playlist.latest_video_thumbnail}
+                        alt={playlist.name}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
                     ) : (
-                      <>
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <svg className="w-12 h-12 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                         </svg>
-                        Private
-                      </>
+                      </div>
                     )}
-                  </span>
+                    
+                    {/* Video count overlay - bottom right */}
+                    <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs font-semibold px-2 py-1 rounded flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                      </svg>
+                      {playlist.video_count || 0}
+                    </div>
+                  </div>
+
+                  {/* Playlist info */}
+                  <div className="px-1">
+                    <h3 className="font-semibold text-charcoal dark:text-white text-sm line-clamp-2 group-hover:text-petflix-orange transition mb-1">
+                      {playlist.name}
+                    </h3>
+                    <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                      <span className={`flex items-center gap-1 ${
+                        playlist.visibility === 'public' 
+                          ? 'text-green-600 dark:text-green-400' 
+                          : 'text-gray-500 dark:text-gray-500'
+                      }`}>
+                        {playlist.visibility === 'public' ? (
+                          <>
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clipRule="evenodd" />
+                            </svg>
+                            Public
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                            </svg>
+                            Private
+                          </>
+                        )}
+                      </span>
+                    </div>
+                  </div>
                 </Link>
               ))}
             </div>
