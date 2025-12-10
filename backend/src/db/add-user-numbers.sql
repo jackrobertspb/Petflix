@@ -34,3 +34,4 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_users_user_number ON users(user_number);
 -- Add comment
 COMMENT ON COLUMN users.user_number IS 'Sequential user number for display (e.g., User #1, #2, #3)';
 
+
