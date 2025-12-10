@@ -108,7 +108,7 @@ export const Navbar = () => {
                   Search
                 </Link>
                 <Link to="/feed" className="text-sm xl:text-base text-charcoal dark:text-white hover:text-petflix-orange dark:hover:text-gray-300 transition font-medium">
-                  My Feed
+                  Explore
                 </Link>
                 <Link to="/share" className="text-sm xl:text-base text-petflix-orange dark:text-petflix-orange hover:opacity-80 transition font-medium">
                   Share
@@ -255,7 +255,7 @@ export const Navbar = () => {
               {user ? (
                 <>
                   <Link to="/feed" onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 text-charcoal dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
-                    My Feed
+                    Explore
                   </Link>
                   <Link to={`/profile/${user.id}`} onClick={() => setMobileMenuOpen(false)} className="px-4 py-2 text-charcoal dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
                     Profile

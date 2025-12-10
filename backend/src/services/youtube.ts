@@ -123,7 +123,7 @@ export async function checkVideoAvailability(videoId: string): Promise<boolean> 
 
 /**
  * Search YouTube videos
- * Automatically adds pet-related context to searches
+ * Locked down to Pets & Animals category with pet-specific filtering
  */
 export async function searchYouTubeVideos(
   query: string,
@@ -135,9 +135,13 @@ export async function searchYouTubeVideos(
   }
 
   try {
-    // Add pet/animal context to the search query
-    const petQuery = `${query} pet OR animal OR dog OR cat`;
-    let url = `${YOUTUBE_API_BASE}/search?part=snippet&type=video&q=${encodeURIComponent(petQuery)}&maxResults=${maxResults}&key=${YOUTUBE_API_KEY}`;
+    // Append "+pet" to search query to ensure pet-related results
+    const petQuery = query.toLowerCase().includes('pet') ? query : `${query}+pet`;
+    
+    // Build URL with pet-specific parameters:
+    // - videoCategoryId=15: Pets & Animals category
+    // - topicId=/m/04rky: Pets topic tag from YouTube's knowledge graph
+    let url = `${YOUTUBE_API_BASE}/search?part=snippet&type=video&q=${encodeURIComponent(petQuery)}&videoCategoryId=15&topicId=/m/04rky&maxResults=${maxResults}&key=${YOUTUBE_API_KEY}`;
     
     if (pageToken) {
       url += `&pageToken=${pageToken}`;

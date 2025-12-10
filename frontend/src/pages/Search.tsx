@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useDebounce } from '../hooks/useDebounce';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
-import { VideoGridSkeleton } from '../components/LoadingSkeleton';
+import { VideoGridSkeleton, VideoCardSkeleton } from '../components/LoadingSkeleton';
 import { EmptyState } from '../components/EmptyState';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -37,16 +37,18 @@ type SortOption = 'relevance' | 'recency' | 'view_count' | 'engagement';
 type SearchSource = 'petflix' | 'youtube';
 
 export const Search = () => {
-  const [query, setQuery] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Initialize state from URL params to retain search when navigating back
+  const [query, setQuery] = useState(searchParams.get('q') || '');
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
-  const [sortBy, setSortBy] = useState<SortOption>('relevance');
+  const [searched, setSearched] = useState(!!searchParams.get('q'));
+  const [sortBy, setSortBy] = useState<SortOption>((searchParams.get('sort') as SortOption) || 'relevance');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [searchSource, setSearchSource] = useState<SearchSource>('petflix');
+  const [searchSource, setSearchSource] = useState<SearchSource>((searchParams.get('source') as SearchSource) || 'petflix');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
-  const [showUnavailable, setShowUnavailable] = useState(false);
   const [followedVideos, setFollowedVideos] = useState<Video[]>([]);
   const [loadingFollowed, setLoadingFollowed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -113,11 +115,18 @@ export const Search = () => {
       performSearch('');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQuery, sortBy, selectedTags.join(','), searchSource, showUnavailable]);
+  }, [debouncedQuery, sortBy, selectedTags.join(','), searchSource]);
 
   const performSearch = async (searchQuery: string) => {
     setLoading(true);
     setSearched(true);
+
+    // Update URL params to retain search state
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('q', searchQuery);
+    if (sortBy !== 'relevance') params.set('sort', sortBy);
+    if (searchSource !== 'petflix') params.set('source', searchSource);
+    setSearchParams(params);
 
     try {
       if (searchSource === 'youtube') {
@@ -165,10 +174,6 @@ export const Search = () => {
         
         if (selectedTags.length > 0) {
           params.append('tags', selectedTags.join(','));
-        }
-        
-        if (showUnavailable) {
-          params.append('show_unavailable', 'true');
         }
 
         const response = await api.get(`/videos/search?${params.toString()}`);
@@ -371,16 +376,6 @@ export const Search = () => {
                 )}
               </div>
 
-              {/* Show Unavailable Videos Toggle */}
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={showUnavailable}
-                  onChange={(e) => setShowUnavailable(e.target.checked)}
-                  className="w-4 h-4 text-petflix-orange bg-white dark:bg-petflix-dark-gray border-gray-300 dark:border-gray-600 rounded focus:ring-petflix-orange focus:ring-2"
-                />
-                <span className="text-sm text-gray-600 dark:text-gray-400">Show unavailable videos</span>
-              </label>
             </div>
           )}
         </form>
@@ -395,7 +390,11 @@ export const Search = () => {
             </svg>
             Videos from People You Follow
           </h2>
-          <VideoGridSkeleton count={8} />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-3">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <VideoCardSkeleton key={i} />
+            ))}
+          </div>
         </div>
       )}
       {!searched && !loadingFollowed && followedVideos.length > 0 && (
@@ -450,7 +449,13 @@ export const Search = () => {
       )}
 
       {loading ? (
-        <VideoGridSkeleton count={12} />
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-3">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <VideoCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
       ) : searched && videos.length === 0 ? (
         <EmptyState
           icon="🔍"
@@ -468,7 +473,8 @@ export const Search = () => {
           }}
         />
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-3">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-3">
           {videos.map((video) => {
             // For YouTube search results, link to YouTube watch page
             const isYouTubeResult = searchSource === 'youtube';
@@ -547,6 +553,7 @@ export const Search = () => {
               </Card>
             );
           })}
+          </div>
         </div>
       )}
     </div>

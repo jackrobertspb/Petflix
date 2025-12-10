@@ -85,10 +85,10 @@ export const Feed = () => {
               <svg className="w-8 h-8 sm:w-10 sm:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
-              Your Feed
+              {feedMode === 'following' ? 'Following' : 'Explore'}
             </h1>
             <p className="text-sm sm:text-base text-gray-700 dark:text-gray-400">
-              {feedMode === 'following' ? 'Videos from users you follow' : 'All shared videos'}
+              {feedMode === 'following' ? 'Videos from users you follow' : 'Discover videos from the community'}
             </p>
           </div>
           
@@ -143,12 +143,12 @@ export const Feed = () => {
             )}
           </div>
           <h2 className="text-3xl font-bold text-charcoal dark:text-white mb-4">
-            {feedMode === 'following' ? 'No Videos from Followed Users' : 'Your Feed is Empty'}
+            {feedMode === 'following' ? 'No Videos from Followed Users' : 'No Videos Yet'}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-lg mb-8">
             {feedMode === 'following'
               ? 'Follow other users to see their shared videos here!'
-              : 'Be the first to share a video or search for pet videos to add to your feed.'}
+              : 'Be the first to share a video from YouTube to get the community started!'}
           </p>
           <Link
             to="/search"

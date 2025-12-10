@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -15,6 +16,7 @@ interface Video {
 }
 
 export const Landing = () => {
+  const { user } = useAuth();
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -77,14 +79,16 @@ export const Landing = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 w-full sm:w-auto">
-            <Button
-              asChild
-              className="w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 md:py-4 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-petflix-black font-bold text-sm sm:text-base md:text-lg shadow-md hover:shadow-lg border border-petflix-orange/30 dark:border-gray-300"
-            >
-              <Link to="/register">
-                <span>▶</span> Get Started
-              </Link>
-            </Button>
+            {!user && (
+              <Button
+                asChild
+                className="w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 md:py-4 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-petflix-black font-bold text-sm sm:text-base md:text-lg shadow-md hover:shadow-lg border border-petflix-orange/30 dark:border-gray-300"
+              >
+                <Link to="/register">
+                  <span>▶</span> Get Started
+                </Link>
+              </Button>
+            )}
             <Button
               asChild
               variant="outline"

@@ -1,22 +1,17 @@
+import { Card, CardContent } from '@/components/ui/card';
+
 // Simple skeleton component with shimmer effect
 const Skeleton = ({ className }: { className?: string }) => (
   <div className={`animate-pulse bg-gray-200 dark:bg-gray-700 ${className}`} />
 );
 
 export const VideoCardSkeleton = () => (
-  <div className="bg-white dark:bg-petflix-dark rounded-lg overflow-hidden border border-gray-200/50 dark:border-gray-800/30">
-    {/* Thumbnail skeleton */}
-    <Skeleton className="w-full aspect-video" />
-    
-    {/* Content skeleton - hidden by default, only shown on hover */}
-    <div className="p-3 space-y-2 opacity-0">
-      {/* Title skeleton */}
-      <Skeleton className="h-4 rounded w-3/4" />
-      
-      {/* User info skeleton */}
-      <Skeleton className="h-3 rounded w-1/2" />
-    </div>
-  </div>
+  <Card className="group relative overflow-hidden border-gray-200/50 dark:border-gray-800/30 p-0">
+    <CardContent className="p-0">
+      {/* Thumbnail skeleton with 16:9 aspect ratio using pb-[56.25%] - matches actual video cards exactly */}
+      <div className="relative w-full pb-[56.25%] bg-gray-200 dark:bg-gray-700 animate-pulse" />
+    </CardContent>
+  </Card>
 );
 
 export const CommentSkeleton = () => (

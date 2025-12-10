@@ -61,10 +61,12 @@ export const OnboardingTutorial = () => {
     // 1. User is logged in
     // 2. Not on excluded routes (auth pages)
     // 3. Tutorial hasn't been completed before
+    // 4. User just registered (check session flag)
     const tutorialShown = localStorage.getItem('petflix_tutorial_shown');
+    const justRegistered = sessionStorage.getItem('petflix_just_registered') === 'true';
     const isExcludedRoute = excludedRoutes.some(route => location.pathname.startsWith(route));
     
-    if (user && !tutorialShown && !isExcludedRoute) {
+    if (user && !tutorialShown && justRegistered && !isExcludedRoute) {
       setShowTutorial(true);
     } else {
       setShowTutorial(false);
@@ -91,6 +93,7 @@ export const OnboardingTutorial = () => {
 
   const handleComplete = () => {
     localStorage.setItem('petflix_tutorial_shown', 'true');
+    sessionStorage.removeItem('petflix_just_registered'); // Clear the registration flag
     setShowTutorial(false);
   };
 

@@ -53,6 +53,11 @@ export const VideoDetail = () => {
   const [selectedPlaylistIds, setSelectedPlaylistIds] = useState<Set<string>>(new Set());
   const [initialPlaylistIds, setInitialPlaylistIds] = useState<Set<string>>(new Set());
   const [savingPlaylists, setSavingPlaylists] = useState(false);
+  const [showCreatePlaylistForm, setShowCreatePlaylistForm] = useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState('');
+  const [newPlaylistDescription, setNewPlaylistDescription] = useState('');
+  const [newPlaylistVisibility, setNewPlaylistVisibility] = useState<'public' | 'private'>('public');
+  const [creatingPlaylist, setCreatingPlaylist] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [reportDetails, setReportDetails] = useState('');
@@ -257,6 +262,54 @@ export const VideoDetail = () => {
       }
       return newSet;
     });
+  };
+
+  const handleCreatePlaylistAndAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPlaylistName.trim() || !id || !user) return;
+
+    setCreatingPlaylist(true);
+    try {
+      // Create the playlist
+      const createResponse = await api.post('/playlists', {
+        name: newPlaylistName,
+        description: newPlaylistDescription || null,
+        visibility: newPlaylistVisibility,
+      });
+
+      const newPlaylist = createResponse.data.playlist;
+      
+      // Add the video to the newly created playlist
+      await api.post(`/playlists/${newPlaylist.id}/videos`, {
+        video_id: id,
+      });
+
+      // Update the playlists list
+      setPlaylists([...playlists, newPlaylist]);
+      
+      // Add to selected playlists
+      const updatedSelected = new Set(selectedPlaylistIds);
+      updatedSelected.add(newPlaylist.id);
+      setSelectedPlaylistIds(updatedSelected);
+      
+      // Update initial playlist IDs so it's marked as added
+      const updatedInitial = new Set(initialPlaylistIds);
+      updatedInitial.add(newPlaylist.id);
+      setInitialPlaylistIds(updatedInitial);
+
+      // Reset form
+      setNewPlaylistName('');
+      setNewPlaylistDescription('');
+      setNewPlaylistVisibility('public');
+      setShowCreatePlaylistForm(false);
+
+      toast.success(`Created playlist "${newPlaylist.name}" and added video!`);
+    } catch (error: any) {
+      console.error('Failed to create playlist and add video:', error);
+      toast.error(error.response?.data?.message || 'Failed to create playlist');
+    } finally {
+      setCreatingPlaylist(false);
+    }
   };
 
   const handleSaveToPlaylists = async () => {
@@ -1220,21 +1273,99 @@ export const VideoDetail = () => {
             <div className="text-center py-8 text-gray-600 dark:text-gray-400">
               Loading playlists...
             </div>
-          ) : playlists.length === 0 ? (
+          ) : playlists.length === 0 && !showCreatePlaylistForm ? (
             <div className="text-center py-8">
               <p className="text-gray-600 dark:text-gray-400 mb-4">You don't have any playlists yet</p>
               <Button
-                asChild
-                className="bg-petflix-orange hover:bg-petflix-red text-white font-bold"
-                onClick={() => setShowPlaylistModal(false)}
+                onClick={() => setShowCreatePlaylistForm(true)}
+                className="bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-white font-bold"
               >
-                <Link to="/playlists">
-                  Create Your First Playlist
-                </Link>
+                Create Playlist & Add Video
               </Button>
             </div>
+          ) : showCreatePlaylistForm ? (
+            <form onSubmit={handleCreatePlaylistAndAdd} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Playlist Name *
+                </label>
+                <Input
+                  type="text"
+                  value={newPlaylistName}
+                  onChange={(e) => setNewPlaylistName(e.target.value)}
+                  placeholder="My Favorite Pets"
+                  required
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Description (optional)
+                </label>
+                <Textarea
+                  value={newPlaylistDescription}
+                  onChange={(e) => setNewPlaylistDescription(e.target.value)}
+                  placeholder="A collection of my favorite pet videos"
+                  rows={3}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Visibility
+                </label>
+                <select
+                  value={newPlaylistVisibility}
+                  onChange={(e) => setNewPlaylistVisibility(e.target.value as 'public' | 'private')}
+                  className="w-full px-4 py-3 bg-gray-100 dark:bg-petflix-dark-gray text-charcoal dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-petflix-orange dark:focus:ring-petflix-orange"
+                >
+                  <option value="public">Public</option>
+                  <option value="private">Private</option>
+                </select>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setShowCreatePlaylistForm(false);
+                    setNewPlaylistName('');
+                    setNewPlaylistDescription('');
+                    setNewPlaylistVisibility('public');
+                  }}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  {playlists.length > 0 ? 'Back to Playlists' : 'Cancel'}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={creatingPlaylist || !newPlaylistName.trim()}
+                  className="flex-1 bg-petflix-orange hover:bg-petflix-orange/80 dark:bg-petflix-orange dark:hover:bg-petflix-red text-white"
+                >
+                  {creatingPlaylist ? 'Creating...' : 'Create & Add Video'}
+                </Button>
+              </div>
+            </form>
           ) : (
             <>
+              {/* Create New Playlist Button */}
+              <div className="mb-4">
+                <Button
+                  type="button"
+                  onClick={() => setShowCreatePlaylistForm(true)}
+                  variant="outline"
+                  className="w-full border-dashed border-2 border-gray-300 dark:border-gray-600 hover:border-petflix-orange dark:hover:border-petflix-orange hover:bg-gray-50 dark:hover:bg-petflix-gray/50 text-charcoal dark:text-white"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Create New Playlist
+                </Button>
+              </div>
+
               <div className="space-y-3 mb-6">
                 {playlists.map((playlist) => (
                   <label

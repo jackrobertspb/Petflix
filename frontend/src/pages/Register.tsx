@@ -52,6 +52,8 @@ export const Register = () => {
 
     try {
       await register(username, email, password);
+      // Set flag to show onboarding tutorial for new users
+      sessionStorage.setItem('petflix_just_registered', 'true');
       // Always redirect to home after registration
       navigate('/', { replace: true });
     } catch (err: any) {
