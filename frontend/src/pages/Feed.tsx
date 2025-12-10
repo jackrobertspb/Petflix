@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
-import { VideoCardSkeleton } from '../components/LoadingSkeleton';
+import { VideoGridSkeleton } from '../components/LoadingSkeleton';
 import { EmptyState } from '../components/EmptyState';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -128,11 +128,7 @@ export const Feed = () => {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <VideoCardSkeleton key={i} />
-          ))}
-        </div>
+        <VideoGridSkeleton count={12} />
       ) : videos.length === 0 ? (
         <div className="text-center py-20 bg-white dark:bg-petflix-dark-gray rounded-lg p-12 max-w-2xl mx-auto border border-gray-200 dark:border-transparent">
           <div className="flex justify-center mb-6">

@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { ProfileHeaderSkeleton, VideoGridSkeleton } from '../components/LoadingSkeleton';
 
 interface User {
   id: string;
@@ -173,8 +174,33 @@ export const Profile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-cream-light dark:bg-petflix-black flex items-center justify-center pt-24">
-        <div className="text-xl text-gray-600 dark:text-gray-400">Loading profile...</div>
+      <div className="min-h-screen bg-cream-light dark:bg-petflix-black pt-20 sm:pt-24 px-4 sm:px-6 md:px-8 lg:px-16">
+        <div className="max-w-7xl mx-auto">
+          <ProfileHeaderSkeleton />
+          
+          {/* Videos Section Skeleton */}
+          <div className="mb-6 sm:mb-8">
+            <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4 sm:mb-6"></div>
+            <VideoGridSkeleton count={12} />
+          </div>
+
+          {/* Playlists Section Skeleton */}
+          <div className="mb-16">
+            <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-6"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="bg-white dark:bg-petflix-dark rounded-lg p-6 border border-gray-200 dark:border-transparent">
+                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-3 animate-pulse"></div>
+                  <div className="space-y-2 mb-4">
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full animate-pulse"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse"></div>
+                  </div>
+                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-20 animate-pulse"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
