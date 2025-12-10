@@ -311,7 +311,7 @@ router.get('/user/:userId', optionalAuth, async (req: Request, res: Response): P
       return;
     }
 
-    // Get video counts for each playlist
+    // Get video counts and latest video thumbnail for each playlist
     const playlistsWithCounts = await Promise.all(
       (playlists || []).map(async (playlist) => {
         const { count } = await supabase
@@ -319,9 +319,23 @@ router.get('/user/:userId', optionalAuth, async (req: Request, res: Response): P
           .select('*', { count: 'exact', head: true })
           .eq('playlist_id', playlist.id);
         
+        // Get the latest video thumbnail
+        const { data: latestVideo } = await supabase
+          .from('playlist_videos')
+          .select('videos(youtube_video_id)')
+          .eq('playlist_id', playlist.id)
+          .order('added_at', { ascending: false })
+          .limit(1)
+          .single();
+        
+        const latestVideoThumbnail = latestVideo?.videos?.youtube_video_id 
+          ? `https://img.youtube.com/vi/${latestVideo.videos.youtube_video_id}/mqdefault.jpg`
+          : null;
+        
         return {
           ...playlist,
-          video_count: count || 0
+          video_count: count || 0,
+          latest_video_thumbnail: latestVideoThumbnail
         };
       })
     );
