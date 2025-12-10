@@ -8,6 +8,21 @@ import { EmptyState } from '../components/EmptyState';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
+// Simple relative time formatter
+const getRelativeTime = (dateString: string): string => {
+  const now = new Date();
+  const past = new Date(dateString);
+  const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+  
+  if (diffInSeconds < 60) return 'just now';
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 604800)}w ago`;
+  if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)}mo ago`;
+  return `${Math.floor(diffInSeconds / 31536000)}y ago`;
+};
+
 interface Video {
   id: string;
   youtube_video_id: string;
@@ -158,19 +173,17 @@ export const Feed = () => {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
           {videos.map((video) => (
-            <Card
+            <Link
               key={video.id}
-              className="group relative overflow-hidden transition-transform duration-200 ease-out hover:scale-105 hover:z-10 border-gray-200/50 dark:border-gray-800/30 shadow-md hover:shadow-xl p-0"
+              to={`/video/${video.id}`}
+              className="block group"
             >
-              <Link
-                to={`/video/${video.id}`}
-                className="block"
-              >
+              <Card className="overflow-hidden transition-transform duration-200 ease-out hover:scale-105 border-gray-200/50 dark:border-gray-800/30 shadow-sm hover:shadow-md p-0">
                 <CardContent className="p-0">
                   {/* Thumbnail Container with 16:9 Aspect Ratio */}
-                  <div className="relative w-full pb-[56.25%] bg-white dark:bg-petflix-dark-gray">
+                  <div className="relative w-full pb-[56.25%] bg-gray-100 dark:bg-petflix-dark-gray">
                     <img
                       src={`https://img.youtube.com/vi/${video.youtube_video_id}/hqdefault.jpg`}
                       alt={video.title}
@@ -186,20 +199,26 @@ export const Feed = () => {
                     />
                   </div>
                   
-                  {/* Info Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <div className="absolute bottom-0 left-0 right-0 p-3">
-                      <h3 className="font-bold text-white text-xs md:text-sm line-clamp-2 mb-1">
-                        {video.title}
-                      </h3>
-                      {video.username && (
-                        <p className="text-xs text-gray-700 dark:text-gray-300">@{video.username}</p>
-                      )}
+                  {/* Video Info Below Thumbnail - YouTube Style */}
+                  <div className="p-3">
+                    {/* Title - Fixed height for consistency */}
+                    <h3 className="font-semibold text-charcoal dark:text-white text-sm line-clamp-2 mb-2 group-hover:text-petflix-orange dark:group-hover:text-petflix-orange transition-colors h-10">
+                      {video.title}
+                    </h3>
+                    
+                    {/* Username and Time */}
+                    <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+                      <span className="truncate">
+                        {video.username ? `@${video.username}` : 'Unknown'}
+                      </span>
+                      <span className="ml-2 flex-shrink-0">
+                        {getRelativeTime(video.created_at)}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
-              </Link>
-            </Card>
+              </Card>
+            </Link>
           ))}
         </div>
       )}
