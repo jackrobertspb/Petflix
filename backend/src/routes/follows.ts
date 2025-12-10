@@ -371,7 +371,7 @@ router.get('/:userId/feed', authenticateToken, validateUserId, async (req: Reque
 
     // Check availability in background (don't await - fire and forget)
     videos?.forEach((video: any) => {
-      checkAndUpdateAvailability(video.id, video.youtube_video_id, video.last_availability_check).catch(err => {
+      checkAndUpdateAvailability(video.id, video.youtube_video_id, video.last_availability_check).catch(_err => {
         // Silently fail - already logged in the function
       });
     });

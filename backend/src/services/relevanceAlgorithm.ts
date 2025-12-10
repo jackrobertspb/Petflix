@@ -29,6 +29,7 @@ export interface VideoWithRelevance {
   likes_count: number;
   comments_count: number;
   engagement: number;
+  is_available: boolean;
 }
 
 // Default weights (can be configured via admin interface)

@@ -11,7 +11,7 @@ import { getStorageStats, checkStorageUsage } from '../services/storageMonitorin
 const router = Router();
 
 // GET /api/v1/admin/relevance-weights - Get current relevance weights
-router.get('/relevance-weights', authenticateToken, requireAdmin, async (req: Request, res: Response): Promise<void> => {
+router.get('/relevance-weights', authenticateToken, requireAdmin, async (_req: Request, res: Response): Promise<void> => {
   try {
     const weights = await getRelevanceWeights();
     res.status(200).json({ weights });
@@ -220,7 +220,7 @@ router.get('/errors/stats',
       }
 
       // Get top endpoints with errors
-      const { data: endpointErrors, error: endpointError } = await supabase
+      const { data: endpointErrors, error: _endpointError } = await supabase
         .from('error_logs')
         .select('endpoint')
         .not('endpoint', 'is', null)
@@ -402,7 +402,7 @@ router.post('/errors/export',
 router.get('/anomaly-config',
   authenticateToken,
   requireAdmin,
-  async (req: Request, res: Response): Promise<void> => {
+  async (_req: Request, res: Response): Promise<void> => {
     try {
       const config = await getAnomalyConfig();
       res.status(200).json({ config });
@@ -452,7 +452,7 @@ router.patch('/anomaly-config',
 router.get('/storage/stats',
   authenticateToken,
   requireAdmin,
-  async (req: Request, res: Response): Promise<void> => {
+  async (_req: Request, res: Response): Promise<void> => {
     try {
       const stats = await getStorageStats();
       
@@ -476,7 +476,7 @@ router.get('/storage/stats',
 router.post('/storage/check',
   authenticateToken,
   requireAdmin,
-  async (req: Request, res: Response): Promise<void> => {
+  async (_req: Request, res: Response): Promise<void> => {
     try {
       const result = await checkStorageUsage();
       res.status(200).json(result);

@@ -419,7 +419,7 @@ router.get('/search', optionalAuth, async (req: Request, res: Response): Promise
 
     // Check availability in background (don't await - fire and forget)
     videos?.forEach((video: any) => {
-      checkAndUpdateAvailability(video.id, video.youtube_video_id, video.last_availability_check).catch(err => {
+      checkAndUpdateAvailability(video.id, video.youtube_video_id, video.last_availability_check).catch(_err => {
         // Silently fail - already logged in the function
       });
     });
@@ -1041,7 +1041,7 @@ router.get('/', optionalAuth, async (req: Request, res: Response): Promise<void>
 
     // Check availability in background (don't await - fire and forget)
     videos?.forEach((video: any) => {
-      checkAndUpdateAvailability(video.id, video.youtube_video_id, video.last_availability_check).catch(err => {
+      checkAndUpdateAvailability(video.id, video.youtube_video_id, video.last_availability_check).catch(_err => {
         // Silently fail - already logged in the function
       });
     });

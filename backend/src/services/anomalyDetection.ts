@@ -21,8 +21,8 @@ interface AnomalyConfig {
 //   timestamp: Date;
 //   errorCount: number;
 //   warnCount: number;
-  infoCount: number;
-}
+//   infoCount: number;
+// }
 
 // Default configuration
 const DEFAULT_CONFIG: AnomalyConfig = {
