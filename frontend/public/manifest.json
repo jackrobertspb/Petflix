@@ -4,8 +4,8 @@
   "description": "Unlimited pet videos, purrs, and paws. Watch, share, and discover the cutest pet moments from YouTube.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#141414",
-  "theme_color": "#FF6B35",
+  "background_color": "#121215",
+  "theme_color": "#E50914",
   "orientation": "any",
   "categories": ["entertainment", "social", "lifestyle"],
   "icons": [

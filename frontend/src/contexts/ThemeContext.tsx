@@ -2,6 +2,16 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 type Theme = 'light' | 'dark';
 
+// TypeScript declarations for View Transitions API
+declare global {
+  interface Document {
+    startViewTransition?: (callback: () => void) => {
+      ready: Promise<void>;
+      finished: Promise<void>;
+    };
+  }
+}
+
 interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
@@ -27,7 +37,24 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    const newTheme: Theme = theme === 'light' ? 'dark' : 'light';
+    
+    // Modern browsers: use View Transitions API for smooth crossfade
+    if (document.startViewTransition) {
+      document.startViewTransition(() => {
+        setTheme(newTheme);
+      });
+    } 
+    // Fallback: CSS transitions for older browsers
+    else {
+      document.documentElement.classList.add('theme-transitioning');
+      setTheme(newTheme);
+      
+      // Remove the transition class after animation completes
+      setTimeout(() => {
+        document.documentElement.classList.remove('theme-transitioning');
+      }, 100);
+    }
   };
 
   return (

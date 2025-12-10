@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
 export const ShareVideo = () => {
+  const [searchParams] = useSearchParams();
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [customTitle, setCustomTitle] = useState('');
   const [customDescription, setCustomDescription] = useState('');
@@ -14,6 +15,18 @@ export const ShareVideo = () => {
   const [existingVideoId, setExistingVideoId] = useState<string | null>(null);
   const [preview, setPreview] = useState<any>(null);
   const navigate = useNavigate();
+
+  // Pre-fill video ID from URL params
+  useEffect(() => {
+    const videoId = searchParams.get('videoId');
+    if (videoId) {
+      setYoutubeUrl(`https://www.youtube.com/watch?v=${videoId}`);
+      setPreview({
+        videoId,
+        thumbnail: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+      });
+    }
+  }, [searchParams]);
 
   const extractVideoId = (url: string): string | null => {
     // Match youtube.com/watch?v=VIDEO_ID

@@ -390,7 +390,7 @@ export const Search = () => {
       {!searched && followedVideos.length > 0 && (
         <div className="max-w-5xl mx-auto mb-12">
           <h2 className="text-xl sm:text-2xl font-bold text-charcoal dark:text-white mb-4 flex items-center gap-2">
-            <svg className="w-6 h-6 text-petflix-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-charcoal dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
             Videos from People You Follow
@@ -463,14 +463,12 @@ export const Search = () => {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-3">
           {videos.map((video) => {
-            // For YouTube search results, link to YouTube
+            // For YouTube search results, link to YouTube watch page
             const isYouTubeResult = searchSource === 'youtube';
             const linkProps = isYouTubeResult
               ? {
-                  as: 'a' as const,
-                  href: `https://www.youtube.com/watch?v=${video.youtube_video_id}`,
-                  target: '_blank',
-                  rel: 'noopener noreferrer'
+                  as: Link,
+                  to: `/watch/${video.youtube_video_id}`
                 }
               : {
                   as: Link,
@@ -485,7 +483,7 @@ export const Search = () => {
                 className="group relative overflow-hidden transition-transform duration-200 ease-out hover:scale-105 hover:z-10 border-gray-200/50 dark:border-gray-800/30 p-0"
               >
                 <Component
-                  {...(isYouTubeResult ? { href: linkProps.href, target: linkProps.target, rel: linkProps.rel } : { to: linkProps.to })}
+                  to={linkProps.to}
                   className="block"
                 >
                   <CardContent className="p-0">

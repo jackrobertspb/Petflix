@@ -53,6 +53,16 @@
   html {
     overflow-x: hidden;
     width: 100%;
+    transition: none;
+  }
+
+  /* Smooth theme transitions for browsers that don't support View Transitions */
+  html.theme-transitioning * {
+    transition: background-color 0.1s ease, 
+                color 0.1s ease, 
+                border-color 0.1s ease,
+                fill 0.1s ease,
+                stroke 0.1s ease !important;
   }
 
   body {
@@ -156,4 +166,40 @@
 
 .animate-slide-in {
   animation: slideIn 0.3s ease-out;
+}
+
+/* Modern smooth crossfade (for browsers that support View Transitions) */
+@supports (view-transition-name: none) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.1s;
+    animation-timing-function: ease-in-out;
+  }
+  
+  /* Smooth crossfade animation */
+  ::view-transition-old(root) {
+    animation-name: fade-out;
+  }
+  
+  ::view-transition-new(root) {
+    animation-name: fade-in;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

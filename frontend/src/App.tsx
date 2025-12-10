@@ -32,6 +32,7 @@ const PlaylistDetail = lazy(() => import('./pages/PlaylistDetail').then(m => ({ 
 const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
 const ShareRedirect = lazy(() => import('./pages/ShareRedirect').then(m => ({ default: m.ShareRedirect })));
 const RecentlyViewed = lazy(() => import('./pages/RecentlyViewed').then(m => ({ default: m.RecentlyViewed })));
+const YouTubeWatch = lazy(() => import('./pages/YouTubeWatch').then(m => ({ default: m.YouTubeWatch })));
 
 function App() {
   return (
@@ -63,6 +64,7 @@ function App() {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/verify-email" element={<VerifyEmailChange />} />
             <Route path="/search" element={<Search />} />
+            <Route path="/watch/:videoId" element={<YouTubeWatch />} />
             <Route path="/s/:shareCode" element={<ShareRedirect />} />
 
             {/* Protected Routes - Everything else requires authentication */}
